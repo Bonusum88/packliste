@@ -630,26 +630,40 @@ function renderTripItems(items,checks){
 async function toggleCheck(itemId,memberId,checked){
   try{
     if(checked){
-      await sbFetch('item_checks?trip_item_id=eq.'+itemId+'&member_id=eq.'+memberId,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+      const r=await fetch(SB_URL+'/rest/v1/item_checks?trip_item_id=eq.'+itemId+'&member_id=eq.'+memberId,{
+        method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+      });
+      if(!r.ok)throw new Error(await r.text());
     }else{
-      await sbFetch('item_checks',{method:'POST',body:JSON.stringify({trip_item_id:itemId,member_id:memberId}),headers:{'Prefer':'return=minimal'}});
+      const r=await fetch(SB_URL+'/rest/v1/item_checks',{
+        method:'POST',
+        headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates,return=minimal'},
+        body:JSON.stringify({trip_item_id:itemId,member_id:memberId})
+      });
+      if(!r.ok)throw new Error(await r.text());
     }
     lastSig='';loadTripData();
-  }catch(e){console.error(e)}
+  }catch(e){alert('Fehler: '+e.message)}
 }
 async function toggleGeneral(itemId,anyChecked){
   try{
     if(anyChecked){
-      // Remove all checks for this item
-      const checks=await sbFetch('item_checks?trip_item_id=eq.'+itemId+'&select=id');
-      await Promise.all(checks.map(c=>sbFetch('item_checks?id=eq.'+c.id,{method:'DELETE',headers:{'Prefer':'return=minimal'}})));
+      const r=await fetch(SB_URL+'/rest/v1/item_checks?trip_item_id=eq.'+itemId,{
+        method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+      });
+      if(!r.ok)throw new Error(await r.text());
     }else{
-      // Check for first member (or all members for general items)
       const mid=tripMembers.length>0?tripMembers[0].id:null;
-      if(mid)await sbFetch('item_checks',{method:'POST',body:JSON.stringify({trip_item_id:itemId,member_id:mid}),headers:{'Prefer':'return=minimal'}});
+      if(!mid)return;
+      const r=await fetch(SB_URL+'/rest/v1/item_checks',{
+        method:'POST',
+        headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates,return=minimal'},
+        body:JSON.stringify({trip_item_id:itemId,member_id:mid})
+      });
+      if(!r.ok)throw new Error(await r.text());
     }
     lastSig='';loadTripData();
-  }catch(e){console.error(e)}
+  }catch(e){alert('Fehler: '+e.message)}
 }
 async function addTripItem(){
   const inp=document.getElementById('new-trip-item');
