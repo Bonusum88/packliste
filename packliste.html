@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Packliste</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --border: #e8e5de;
+    --text: #1a1a1a;
+    --muted: #888;
+    --accent: #2d6a4f;
+    --accent2: #1a4a8a;
+    --danger: #c0392b;
+    --radius: 12px;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+  .app { max-width: 480px; margin: 0 auto; padding: 1rem; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 0.75rem 0 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .topbar h1 { font-size: 18px; font-weight: 600; flex: 1; }
+  .topbar .sub { font-size: 13px; color: var(--muted); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 10px; }
+
+  button { font-family: var(--font); cursor: pointer; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; padding: 8px 14px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  button:hover { background: var(--bg); }
+  button:active { transform: scale(0.97); }
+  .btn-primary { background: var(--text); color: var(--surface); border-color: transparent; }
+  .btn-primary:hover { opacity: 0.85; background: var(--text); }
+  .btn-danger { color: var(--danger); border-color: #f5c6c2; }
+  .btn-danger:hover { background: #fdf0ef; }
+  .btn-full { width: 100%; justify-content: center; }
+  .btn-sm { padding: 5px 10px; font-size: 13px; }
+
+  input[type=text], input[type=password] {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text); font-size: 15px; font-family: var(--font);
+    margin-bottom: 10px; outline: none; transition: border 0.15s;
+  }
+  input:focus { border-color: var(--accent); }
+
+  .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .template-row { display: flex; align-items: center; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .template-row:last-child { border-bottom: none; }
+  .template-row:hover .tname { color: var(--accent); }
+  .tname { font-size: 16px; flex: 1; font-weight: 500; }
+  .tcount { font-size: 12px; color: var(--muted); }
+  .ticon { font-size: 20px; }
+  .tchev { font-size: 14px; color: var(--muted); }
+
+  .item-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .item-row:last-child { border-bottom: none; }
+  .item-name { flex: 1; font-size: 15px; }
+  .item-name.done { text-decoration: line-through; color: var(--muted); }
+
+  .checker { display: flex; gap: 6px; }
+  .av { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--muted); transition: all 0.15s; user-select: none; }
+  .av.c1 { background: #dbeafe; color: #1a4a8a; border-color: #93c5fd; }
+  .av.c2 { background: #d1fae5; color: #1a5c3a; border-color: #6ee7b7; }
+
+  .progress-wrap { margin: 0.5rem 0 0.75rem; }
+  .progress-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
+  .progress-label { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+  .add-row { display: flex; gap: 8px; margin-top: 0.75rem; }
+  .add-row input { flex: 1; margin-bottom: 0; }
+
+  .msg { font-size: 13px; color: var(--muted); margin-top: 8px; min-height: 18px; padding: 6px 0; }
+  .msg.err { color: var(--danger); }
+  .msg.ok { color: var(--accent); }
+
+  .setup-step { background: var(--bg); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+  .setup-step p { font-size: 14px; color: #444; line-height: 1.6; }
+  .step-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--text); color: var(--surface); font-size: 11px; font-weight: 600; margin-right: 6px; }
+  .sql-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 8px; font-family: monospace; font-size: 11px; color: #555; line-height: 1.6; word-break: break-all; }
+
+  .legend { display: flex; gap: 10px; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .pill-blue { background: #dbeafe; color: #1a4a8a; }
+  .pill-green { background: #d1fae5; color: #1a5c3a; }
+  .spacer { flex: 1; }
+
+  .empty { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 15px; }
+  .empty .ico { font-size: 40px; margin-bottom: 0.5rem; }
+
+  .footer-btns { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Setup Screen -->
+  <div id="screen-setup" class="screen active">
+    <div class="topbar">
+      <span style="font-size:24px">🎒</span>
+      <h1>Packlisten-App</h1>
+    </div>
+
+    <div class="card">
+      <p style="font-size:15px;font-weight:600;margin-bottom:12px">👤 Eure Namen</p>
+      <span class="label">Dein Name</span>
+      <input type="text" id="name1" placeholder="z.B. Silvan">
+      <span class="label">Name deiner Frau</span>
+      <input type="text" id="name2" placeholder="z.B. Maria">
+    </div>
+
+    <div class="card">
+      <p style="font-size:15px;font-weight:600;margin-bottom:12px">☁️ Supabase verbinden</p>
+
+      <div class="setup-step">
+        <p><span class="step-n">1</span>Gehe zu <strong>supabase.com</strong> → kostenloses Konto erstellen</p>
+      </div>
+      <div class="setup-step">
+        <p><span class="step-n">2</span>Neues Projekt erstellen → Region <strong>Frankfurt</strong></p>
+      </div>
+      <div class="setup-step">
+        <p><span class="step-n">3</span><strong>Project Settings → API</strong> öffnen → URL und anon Key kopieren</p>
+      </div>
+      <div class="setup-step">
+        <p><span class="step-n">4</span><strong>SQL Editor</strong> → neuen Query → SQL einfügen → Run</p>
+        <div class="sql-box" id="sql-display">create table if not exists templates (id uuid default gen_random_uuid() primary key, name text not null, created_at timestamptz default now());
+create table if not exists items (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id) on delete cascade, name text not null, checked_1 boolean default false, checked_2 boolean default false, created_at timestamptz default now());
+alter table templates enable row level security;
+alter table items enable row level security;
+create policy "all" on templates for all using (true);
+create policy "all" on items for all using (true);</div>
+        <button class="btn-sm" onclick="copySQL()" style="margin-top:8px">📋 SQL kopieren</button>
+      </div>
+
+      <span class="label" style="margin-top:4px">Supabase Project URL</span>
+      <input type="text" id="sb-url" placeholder="https://xyz.supabase.co">
+      <span class="label">Supabase Anon Key</span>
+      <input type="password" id="sb-key" placeholder="eyJhbGci...">
+
+      <div id="setup-msg" class="msg"></div>
+      <button class="btn-primary btn-full" onclick="connectSupabase()">🔌 Verbinden & App starten</button>
+    </div>
+
+    <div class="card" style="background:transparent;border-style:dashed">
+      <p style="font-size:13px;color:var(--muted)">Deine Daten werden nur in deinem eigenen Supabase-Projekt gespeichert. Die Verbindungsdaten bleiben lokal auf diesem Gerät.</p>
+    </div>
+  </div>
+
+  <!-- Home Screen -->
+  <div id="screen-home" class="screen">
+    <div class="topbar">
+      <span style="font-size:22px">🎒</span>
+      <h1>Vorlagen</h1>
+      <span class="sub" id="home-names"></span>
+    </div>
+
+    <div id="template-list"></div>
+
+    <button class="btn-primary btn-full" style="margin-top:0.75rem" onclick="showNewTemplate()">+ Neue Vorlage</button>
+
+    <div id="new-template-box" style="display:none;margin-top:0.75rem" class="card">
+      <span class="label">Name der Vorlage</span>
+      <input type="text" id="new-tpl-name" placeholder="z.B. Strandferien, Skiferien...">
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary" onclick="createTemplate()">Erstellen</button>
+        <button onclick="hideNewTemplate()">Abbrechen</button>
+      </div>
+    </div>
+
+    <div class="footer-btns">
+      <button class="btn-sm" onclick="showSetup()">⚙️ Einstellungen</button>
+    </div>
+  </div>
+
+  <!-- List Screen -->
+  <div id="screen-list" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" onclick="goHome()">← Zurück</button>
+      <h1 id="list-title">Vorlage</h1>
+      <button class="btn-sm btn-danger" onclick="deleteTemplate()">🗑</button>
+    </div>
+
+    <div class="legend">
+      <span class="pill pill-blue" id="legend-1">P1</span>
+      <span class="pill pill-green" id="legend-2">P2</span>
+      <div class="spacer"></div>
+      <button class="btn-sm" onclick="resetChecks()">↺ Reset</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 von 0 vollständig gepackt</div>
+    </div>
+
+    <div class="card" style="padding:0.5rem 1rem">
+      <div id="items-list"></div>
+    </div>
+
+    <div class="add-row">
+      <input type="text" id="new-item-name" placeholder="Artikel hinzufügen...">
+      <button class="btn-primary" onclick="addItem()">+</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let SB_URL = '', SB_KEY = '', name1 = '', name2 = '';
+let currentTemplate = null;
+let pollTimer = null;
+let lastItems = '';
+
+const SQL = `create table if not exists templates (id uuid default gen_random_uuid() primary key, name text not null, created_at timestamptz default now());
+create table if not exists items (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id) on delete cascade, name text not null, checked_1 boolean default false, checked_2 boolean default false, created_at timestamptz default now());
+alter table templates enable row level security;
+alter table items enable row level security;
+create policy "all" on templates for all using (true);
+create policy "all" on items for all using (true);`;
+
+function ls(k, v) {
+  if (v === undefined) return localStorage.getItem(k) || '';
+  localStorage.setItem(k, v);
+}
+
+function init() {
+  SB_URL = ls('sb_url');
+  SB_KEY = ls('sb_key');
+  name1 = ls('name1');
+  name2 = ls('name2');
+  document.getElementById('sb-url').value = SB_URL;
+  document.getElementById('sb-key').value = SB_KEY;
+  document.getElementById('name1').value = name1;
+  document.getElementById('name2').value = name2;
+  if (SB_URL && SB_KEY && name1 && name2) showHome();
+}
+
+async function sbFetch(path, opts = {}) {
+  const url = SB_URL.replace(/\/$/, '') + '/rest/v1/' + path;
+  const res = await fetch(url, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(txt);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+async function connectSupabase() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  const n1 = document.getElementById('name1').value.trim();
+  const n2 = document.getElementById('name2').value.trim();
+  const msg = document.getElementById('setup-msg');
+
+  if (!n1 || !n2) { showMsg('setup-msg', 'Bitte beide Namen eingeben.', true); return; }
+  if (!url || !key) { showMsg('setup-msg', 'Bitte URL und Anon Key eingeben.', true); return; }
+
+  showMsg('setup-msg', 'Verbindung wird getestet...', false);
+  SB_URL = url.replace(/\/$/, '');
+  SB_KEY = key;
+
+  try {
+    await sbFetch('templates?limit=1');
+    ls('sb_url', SB_URL); ls('sb_key', SB_KEY);
+    ls('name1', n1); ls('name2', n2);
+    name1 = n1; name2 = n2;
+    showMsg('setup-msg', '✓ Verbunden!', false);
+    setTimeout(showHome, 500);
+  } catch(e) {
+    showMsg('setup-msg', 'Fehler: ' + e.message.slice(0, 150), true);
+  }
+}
+
+function showMsg(id, txt, err) {
+  const el = document.getElementById(id);
+  el.textContent = txt;
+  el.className = 'msg' + (err ? ' err' : ' ok');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showSetup() {
+  clearInterval(pollTimer);
+  showScreen('setup');
+}
+
+function showHome() {
+  clearInterval(pollTimer);
+  showScreen('home');
+  document.getElementById('home-names').textContent = name1 + ' & ' + name2;
+  loadTemplates();
+}
+
+function goHome() {
+  clearInterval(pollTimer);
+  showHome();
+}
+
+async function loadTemplates() {
+  const list = document.getElementById('template-list');
+  list.innerHTML = '<div class="empty"><div>⏳</div>Lädt...</div>';
+  try {
+    const templates = await sbFetch('templates?order=created_at.asc');
+    if (!templates.length) {
+      list.innerHTML = '<div class="empty"><div class="ico">📋</div>Noch keine Vorlagen.<br>Erstelle deine erste!</div>';
+      return;
+    }
+    const counts = await Promise.all(templates.map(t =>
+      sbFetch('items?template_id=eq.' + t.id + '&select=id,checked_1,checked_2')
+    ));
+    list.innerHTML = '';
+    templates.forEach((t, i) => {
+      const items = counts[i];
+      const total = items.length;
+      const done = items.filter(x => x.checked_1 && x.checked_2).length;
+      const pct = total ? Math.round(done/total*100) : 0;
+      const row = document.createElement('div');
+      row.className = 'template-row';
+      row.innerHTML = `
+        <span class="ticon">🧳</span>
+        <div style="flex:1">
+          <div class="tname">${esc(t.name)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${total} Artikel · ${pct}% gepackt</div>
+        </div>
+        <span class="tchev">›</span>`;
+      row.onclick = () => openTemplate(t);
+      list.appendChild(row);
+    });
+  } catch(e) {
+    list.innerHTML = '<div class="empty" style="color:var(--danger)">Fehler: ' + esc(e.message) + '</div>';
+  }
+}
+
+function showNewTemplate() {
+  document.getElementById('new-template-box').style.display = 'block';
+  document.getElementById('new-tpl-name').focus();
+}
+
+function hideNewTemplate() {
+  document.getElementById('new-template-box').style.display = 'none';
+  document.getElementById('new-tpl-name').value = '';
+}
+
+async function createTemplate() {
+  const name = document.getElementById('new-tpl-name').value.trim();
+  if (!name) return;
+  try {
+    await sbFetch('templates', { method: 'POST', body: JSON.stringify({ name }) });
+    hideNewTemplate();
+    loadTemplates();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function openTemplate(t) {
+  currentTemplate = t;
+  document.getElementById('list-title').textContent = t.name;
+  document.getElementById('legend-1').textContent = name1;
+  document.getElementById('legend-2').textContent = name2;
+  showScreen('list');
+  lastItems = '';
+  await loadItems();
+  clearInterval(pollTimer);
+  pollTimer = setInterval(loadItems, 3000);
+}
+
+async function loadItems() {
+  if (!currentTemplate) return;
+  try {
+    const items = await sbFetch('items?template_id=eq.' + currentTemplate.id + '&order=created_at.asc');
+    const sig = JSON.stringify(items);
+    if (sig === lastItems) return;
+    lastItems = sig;
+    renderItems(items);
+  } catch(e) {}
+}
+
+function renderItems(items) {
+  const total = items.length;
+  const done = items.filter(i => i.checked_1 && i.checked_2).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = done + ' von ' + total + ' vollständig gepackt';
+
+  const list = document.getElementById('items-list');
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><div class="ico">✏️</div>Noch keine Artikel.<br>Füge welche unten hinzu!</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  items.forEach(item => {
+    const bothDone = item.checked_1 && item.checked_2;
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    const ini1 = initials(name1), ini2 = initials(name2);
+    row.innerHTML = `
+      <span class="item-name${bothDone ? ' done' : ''}">${esc(item.name)}</span>
+      <div class="checker">
+        <div class="av${item.checked_1 ? ' c1' : ''}" onclick="toggle('${item.id}',1,${item.checked_1})" title="${esc(name1)}">${ini1}</div>
+        <div class="av${item.checked_2 ? ' c2' : ''}" onclick="toggle('${item.id}',2,${item.checked_2})" title="${esc(name2)}">${ini2}</div>
+      </div>
+      <button class="btn-sm btn-danger" onclick="deleteItem('${item.id}')" style="border:none;padding:4px 6px;font-size:13px">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+async function toggle(id, person, current) {
+  const field = 'checked_' + person;
+  try {
+    await sbFetch('items?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ [field]: !current }) });
+    lastItems = '';
+    loadItems();
+  } catch(e) {}
+}
+
+async function addItem() {
+  const inp = document.getElementById('new-item-name');
+  const name = inp.value.trim();
+  if (!name || !currentTemplate) return;
+  inp.value = '';
+  try {
+    await sbFetch('items', { method: 'POST', body: JSON.stringify({ template_id: currentTemplate.id, name }) });
+    lastItems = '';
+    loadItems();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('new-item-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addItem();
+  });
+  document.getElementById('new-tpl-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') createTemplate();
+  });
+});
+
+async function deleteItem(id) {
+  if (!confirm('Artikel löschen?')) return;
+  try {
+    await sbFetch('items?id=eq.' + id, { method: 'DELETE' });
+    lastItems = '';
+    loadItems();
+  } catch(e) {}
+}
+
+async function deleteTemplate() {
+  if (!confirm('Vorlage "' + currentTemplate.name + '" und alle Artikel löschen?')) return;
+  try {
+    await sbFetch('templates?id=eq.' + currentTemplate.id, { method: 'DELETE' });
+    goHome();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function resetChecks() {
+  if (!confirm('Alle Häkchen zurücksetzen?')) return;
+  try {
+    const items = await sbFetch('items?template_id=eq.' + currentTemplate.id + '&select=id');
+    await Promise.all(items.map(i =>
+      sbFetch('items?id=eq.' + i.id, { method: 'PATCH', body: JSON.stringify({ checked_1: false, checked_2: false }) })
+    ));
+    lastItems = '';
+    loadItems();
+  } catch(e) {}
+}
+
+function copySQL() {
+  navigator.clipboard.writeText(SQL).then(() => alert('SQL kopiert!')).catch(() => {
+    prompt('SQL zum Kopieren:', SQL);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function initials(n) {
+  return (n || '?').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+init();
+</script>
+</body>
+</html>
