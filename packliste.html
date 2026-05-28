@@ -704,8 +704,14 @@ async function togglePerPerson(itemId,perPerson){
   }catch(e){alert('Fehler: '+e.message)}
 }
 async function deleteTripItem(id){
-  await sbFetch('trip_items?id=eq.'+id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
-  lastSig='';loadTripData();
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/trip_items?id=eq.'+id,{
+      method:'DELETE',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    if(!r.ok)throw new Error(await r.text());
+    lastSig='';loadTripData();
+  }catch(e){alert('Fehler: '+e.message)}
 }
 async function deleteTrip(){
   if(!confirm('Ferienliste "'+currentTrip.name+'" löschen?'))return;
