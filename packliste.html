@@ -231,9 +231,16 @@ input:checked+.slider:before{transform:translateX(18px)}
   <div class="progress-bar"><div class="progress-fill" id="trip-progress" style="width:0%"></div></div>
   <div class="progress-label" id="trip-progress-label" style="margin-bottom:0.75rem">0 von 0 vollständig gepackt</div>
   <div class="card" style="padding:0.5rem 1rem"><div id="trip-items-list"></div></div>
-  <div class="add-row">
-    <input type="text" id="new-trip-item" placeholder="Artikel hinzufügen...">
-    <button class="btn-primary" onclick="addTripItem()">+</button>
+  <div class="card" style="margin-top:8px;padding:0.75rem 1rem">
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="text" id="new-trip-item" placeholder="Artikel hinzufügen..." style="flex:1;margin-bottom:0">
+      <input type="number" id="new-trip-qty" value="1" min="1" style="width:58px;margin-bottom:0;padding:10px 8px;text-align:center">
+      <button class="btn-primary" onclick="addTripItem()" style="flex-shrink:0">+</button>
+    </div>
+    <div class="toggle-row" style="margin-top:8px;margin-bottom:0">
+      <span class="toggle-label" style="font-size:13px;color:var(--muted)">Pro Person</span>
+      <label class="toggle"><input type="checkbox" id="new-trip-perperson"><span class="slider"></span></label>
+    </div>
   </div>
 </div>
 
@@ -617,10 +624,15 @@ function renderTripItems(items,checks){
     const meta=[];
     if(item.qty>1)meta.push('<span style="font-size:11px;color:var(--muted)">×'+item.qty+'</span>');
     if(item.per_person)meta.push('<span class="badge badge-blue" style="font-size:10px">pro Person</span>');
+    const ppToggle=`<label class="toggle" style="transform:scale(0.75)" title="${item.per_person?'Pro Person':'Allgemein – umschalten'}"><input type="checkbox" ${item.per_person?'checked':''} onchange="togglePerPerson('${item.id}',this.checked)"><span class="slider"></span></label>`;
     row.innerHTML=`
       <div style="flex:1">
         <div class="item-name${isDone?' done':''}">${esc(item.name)}</div>
-        ${meta.length?'<div style="display:flex;gap:4px;align-items:center;margin-top:2px">'+meta.join('')+'</div>':''}
+        <div style="display:flex;gap:5px;align-items:center;margin-top:3px">
+          <span style="font-size:10px;color:var(--muted)">${item.per_person?'pro Person':'allgemein'}</span>
+          ${ppToggle}
+          ${item.qty>1?'<span style="font-size:11px;color:var(--muted)">×'+item.qty+'</span>':''}
+        </div>
       </div>
       <div class="checker">${avHtml}</div>
       <button class="btn-icon btn-danger" onclick="deleteTripItem('${item.id}')">✕</button>`;
@@ -668,11 +680,29 @@ async function toggleGeneral(itemId,anyChecked){
 async function addTripItem(){
   const inp=document.getElementById('new-trip-item');
   const name=inp.value.trim();if(!name||!currentTrip)return;
+  const per_person=document.getElementById('new-trip-perperson').checked;
+  const qty=Math.max(1,parseInt(document.getElementById('new-trip-qty').value)||1);
   inp.value='';
-  await sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:currentTrip.id,name,qty:1,per_person:false})});
+  document.getElementById('new-trip-qty').value='1';
+  await sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:currentTrip.id,name,qty,per_person})});
   lastSig='';loadTripData();
 }
 document.getElementById('new-trip-item').addEventListener('keydown',e=>{if(e.key==='Enter')addTripItem()});
+async function togglePerPerson(itemId,perPerson){
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/trip_items?id=eq.'+itemId,{
+      method:'PATCH',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({per_person:perPerson})
+    });
+    if(!r.ok)throw new Error(await r.text());
+    // Also clear checks when switching mode
+    const r2=await fetch(SB_URL+'/rest/v1/item_checks?trip_item_id=eq.'+itemId,{
+      method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    lastSig='';loadTripData();
+  }catch(e){alert('Fehler: '+e.message)}
+}
 async function deleteTripItem(id){
   await sbFetch('trip_items?id=eq.'+id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
   lastSig='';loadTripData();
