@@ -8,14 +8,13 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#f5f4f0;--surface:#ffffff;--border:#e2dfd8;--text:#1c1c1c;--muted:#8a8a8a;
-  --accent:#2d6a4f;--accent-bg:#e8f5ee;--blue:#1a4a8a;--blue-bg:#dbeafe;
-  --danger:#c0392b;--danger-bg:#fdf0ef;
+  --accent:#2d6a4f;--accent-bg:#e8f5ee;--danger:#c0392b;--danger-bg:#fdf0ef;
   --radius:12px;--font:'Segoe UI',system-ui,sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
 .app{max-width:480px;margin:0 auto;padding:1rem}
 .screen{display:none}.screen.active{display:block}
-.topbar{display:flex;align-items:center;gap:10px;padding:0.6rem 0 0.9rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.topbar{display:flex;align-items:center;gap:8px;padding:0.6rem 0 0.9rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
 .topbar h1{font-size:17px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 button{font-family:var(--font);cursor:pointer;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;padding:8px 14px;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 button:hover{background:var(--bg)}button:active{transform:scale(0.97)}
@@ -23,24 +22,29 @@ button:hover{background:var(--bg)}button:active{transform:scale(0.97)}
 .btn-primary:hover{opacity:0.85;background:var(--text)}
 .btn-danger{color:var(--danger);border-color:#f5c6c2}.btn-danger:hover{background:var(--danger-bg)}
 .btn-full{width:100%;justify-content:center}.btn-sm{padding:5px 10px;font-size:13px}
-.btn-icon{padding:5px 8px;font-size:16px;border:none;background:transparent;color:var(--muted)}
-.btn-icon:hover{color:var(--text);background:var(--bg)}
-input[type=text],input[type=password],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:15px;font-family:var(--font);margin-bottom:10px;outline:none;transition:border 0.15s}
+.btn-icon{padding:5px 7px;font-size:15px;border:none;background:transparent;color:var(--muted)}
+.btn-icon:hover{color:var(--text)}
+input[type=text],input[type=password],input[type=number],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:15px;font-family:var(--font);margin-bottom:10px;outline:none;transition:border 0.15s}
 input:focus,select:focus{border-color:var(--accent)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:10px}
 .card-title{font-size:15px;font-weight:600;margin-bottom:12px}
 .label{font-size:11px;color:var(--muted);margin-bottom:4px;display:block;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
 .row{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border)}
 .row:last-child{border-bottom:none}
-.av{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;user-select:none;flex-shrink:0}
+
+/* Avatar – 3 letters, wider */
+.av{height:34px;min-width:34px;padding:0 6px;border-radius:17px;border:1.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;user-select:none;letter-spacing:0.03em}
+.av-sm{height:26px;min-width:26px;padding:0 5px;border-radius:13px;font-size:9px}
 .c0{background:#dbeafe;color:#1a4a8a;border-color:#93c5fd}
 .c1{background:#d1fae5;color:#1a5c3a;border-color:#6ee7b7}
 .c2{background:#fce7f3;color:#831843;border-color:#f9a8d4}
 .c3{background:#fef3c7;color:#78350f;border-color:#fcd34d}
 .c4{background:#ede9fe;color:#4c1d95;border-color:#c4b5fd}
 .c5{background:#fee2e2;color:#7f1d1d;border-color:#fca5a5}
-.c6{background:#ecfdf5;color:#064e3b;border-color:#6ee7b7}
+.c6{background:#d1fae5;color:#065f46;border-color:#34d399}
 .c7{background:#fff7ed;color:#7c2d12;border-color:#fdba74}
+.av-unchecked{background:var(--bg)!important;color:var(--muted)!important;border-color:var(--border)!important}
+
 .progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0 3px}
 .progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s}
 .progress-label{font-size:12px;color:var(--muted)}
@@ -50,25 +54,40 @@ input:focus,select:focus{border-color:var(--accent)}
 .msg.err{color:var(--danger)}.msg.ok{color:var(--accent)}
 .setup-step{background:var(--bg);border-radius:10px;padding:0.9rem;margin-bottom:8px;font-size:14px;color:#444;line-height:1.6}
 .step-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--text);color:var(--surface);font-size:11px;font-weight:700;margin-right:6px}
-.sql-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px;font-family:monospace;font-size:10px;color:#555;line-height:1.6;word-break:break-all;white-space:pre-wrap;max-height:150px;overflow-y:auto}
+.sql-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px;font-family:monospace;font-size:10px;color:#555;line-height:1.6;word-break:break-all;white-space:pre-wrap;max-height:130px;overflow-y:auto}
 .member-grid{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .member-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);cursor:pointer;font-size:14px;transition:all 0.15s;background:var(--surface)}
 .member-chip.selected{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:600}
 .item-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
 .item-row:last-child{border-bottom:none}
 .item-name{flex:1;font-size:15px}.item-name.done{text-decoration:line-through;color:var(--muted)}
-.checker{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.item-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.checker{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .tabs{display:flex;gap:4px;margin-bottom:1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px}
 .tab{flex:1;text-align:center;padding:7px 4px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.15s}
 .tab.active{background:var(--text);color:var(--surface)}
 .lock-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:1rem}
 .empty{text-align:center;padding:2rem 1rem;color:var(--muted)}
 .empty-ico{font-size:36px;margin-bottom:8px}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-blue{background:#dbeafe;color:#1a4a8a}
+.badge-green{background:#d1fae5;color:#1a5c3a}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.toggle-label{font-size:14px;flex:1}
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#ccc;border-radius:24px;cursor:pointer;transition:.3s}
+.slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:white;border-radius:50%;transition:.3s}
+input:checked+.slider{background:var(--accent)}
+input:checked+.slider:before{transform:translateX(18px)}
+.tpl-item-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.tpl-item-row:last-child{border-bottom:none}
 </style>
 </head>
 <body>
 <div class="app">
 
+<!-- LOCK -->
 <div id="screen-lock" class="screen active">
   <div class="lock-wrap">
     <div style="font-size:48px">🔒</div>
@@ -83,22 +102,22 @@ input:focus,select:focus{border-color:var(--accent)}
   </div>
 </div>
 
+<!-- SETUP -->
 <div id="screen-setup" class="screen">
   <div class="topbar">
-    <span style="font-size:22px">🎒</span>
-    <h1>Einrichtung</h1>
+    <span style="font-size:22px">🎒</span><h1>Einrichtung</h1>
     <button class="btn-sm" id="setup-back-btn" onclick="goHome()" style="display:none">← Zurück</button>
   </div>
   <div class="card">
     <div class="card-title">🔒 Passwortschutz</div>
-    <span class="label">App-Passwort (für alle Familienmitglieder gleich)</span>
+    <span class="label">App-Passwort (für alle gleich)</span>
     <input type="password" id="setup-pw" placeholder="Passwort wählen">
     <span class="label">Passwort wiederholen</span>
     <input type="password" id="setup-pw2" placeholder="Passwort wiederholen">
   </div>
   <div class="card">
     <div class="card-title">☁️ Supabase verbinden</div>
-    <div class="setup-step"><span class="step-n">1</span>Gehe zu <strong>supabase.com</strong> → kostenloses Konto erstellen</div>
+    <div class="setup-step"><span class="step-n">1</span>Gehe zu <strong>supabase.com</strong> → kostenloses Konto</div>
     <div class="setup-step"><span class="step-n">2</span>Neues Projekt → Region <strong>Frankfurt (eu-central-1)</strong></div>
     <div class="setup-step"><span class="step-n">3</span><strong>Project Settings → API</strong> → URL + anon Key kopieren</div>
     <div class="setup-step">
@@ -115,26 +134,27 @@ input:focus,select:focus{border-color:var(--accent)}
   </div>
 </div>
 
+<!-- HOME -->
 <div id="screen-home" class="screen">
   <div class="topbar">
-    <span style="font-size:20px">🎒</span>
-    <h1>Packliste</h1>
-    <button class="btn-icon" onclick="lockApp()" title="Sperren">🔒</button>
-    <button class="btn-icon" onclick="showSetupFromHome()" title="Einstellungen">⚙️</button>
+    <span style="font-size:20px">🎒</span><h1>Packliste</h1>
+    <button class="btn-icon" onclick="lockApp()">🔒</button>
+    <button class="btn-icon" onclick="showSetupFromHome()">⚙️</button>
   </div>
   <div class="tabs">
     <button class="tab active" id="tab-trips" onclick="switchTab('trips')">🏖 Ferien</button>
     <button class="tab" id="tab-templates" onclick="switchTab('templates')">📋 Vorlagen</button>
     <button class="tab" id="tab-family" onclick="switchTab('family')">👨‍👩‍👧 Familie</button>
   </div>
+  <!-- Ferien -->
   <div id="tab-content-trips">
     <div id="trips-list"></div>
     <button class="btn-primary btn-full" style="margin-top:4px" onclick="showCreateTrip()">+ Neue Ferienliste</button>
     <div id="create-trip-box" style="display:none;margin-top:10px" class="card">
       <div class="card-title">Neue Ferienliste</div>
-      <span class="label">Name (z.B. Strandferien Korsika 2025)</span>
-      <input type="text" id="new-trip-name" placeholder="Ferien 2025...">
-      <span class="label">Vorlage verwenden (optional)</span>
+      <span class="label">Name</span>
+      <input type="text" id="new-trip-name" placeholder="z.B. Kreta 2026">
+      <span class="label">Vorlage (optional)</span>
       <select id="new-trip-template"><option value="">— Keine Vorlage —</option></select>
       <span class="label">Teilnehmer</span>
       <div class="member-grid" id="trip-member-select"></div>
@@ -144,19 +164,21 @@ input:focus,select:focus{border-color:var(--accent)}
       </div>
     </div>
   </div>
+  <!-- Vorlagen -->
   <div id="tab-content-templates" style="display:none">
     <div id="templates-list"></div>
     <button class="btn-primary btn-full" style="margin-top:4px" onclick="showCreateTemplate()">+ Neue Vorlage</button>
     <div id="create-template-box" style="display:none;margin-top:10px" class="card">
       <div class="card-title">Neue Vorlage</div>
-      <span class="label">Name (z.B. Strandferien, Skiferien)</span>
-      <input type="text" id="new-tpl-name" placeholder="Vorlage...">
+      <span class="label">Name</span>
+      <input type="text" id="new-tpl-name" placeholder="z.B. Strandferien">
       <div style="display:flex;gap:8px">
         <button class="btn-primary" onclick="createTemplate()">Erstellen</button>
         <button onclick="hideCreateTemplate()">Abbrechen</button>
       </div>
     </div>
   </div>
+  <!-- Familie -->
   <div id="tab-content-family" style="display:none">
     <div id="family-list"></div>
     <div class="add-row">
@@ -167,20 +189,35 @@ input:focus,select:focus{border-color:var(--accent)}
   </div>
 </div>
 
+<!-- VORLAGE DETAIL -->
 <div id="screen-template" class="screen">
   <div class="topbar">
     <button class="btn-sm" onclick="goHome()">← Zurück</button>
     <h1 id="tpl-title">Vorlage</h1>
     <button class="btn-sm btn-danger" onclick="deleteTemplate()">🗑</button>
   </div>
-  <p style="font-size:13px;color:var(--muted);margin-bottom:0.75rem">Artikel werden beim Erstellen einer Ferienliste aus dieser Vorlage kopiert.</p>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:0.75rem">Artikel werden beim Erstellen einer Ferienliste kopiert.</p>
   <div class="card" style="padding:0.5rem 1rem"><div id="tpl-items-list"></div></div>
-  <div class="add-row">
-    <input type="text" id="new-tpl-item" placeholder="Artikel hinzufügen...">
-    <button class="btn-primary" onclick="addTemplateItem()">+</button>
+  <!-- Neuer Artikel zur Vorlage -->
+  <div class="card" style="margin-top:4px">
+    <div class="card-title" style="margin-bottom:8px">Artikel hinzufügen</div>
+    <span class="label">Name</span>
+    <input type="text" id="new-tpl-item" placeholder="z.B. Sonnencreme">
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div style="flex:1">
+        <span class="label">Anzahl</span>
+        <input type="number" id="new-tpl-qty" value="1" min="1" style="margin-bottom:0">
+      </div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Pro Person (jede Person packt separat)</span>
+      <label class="toggle"><input type="checkbox" id="new-tpl-perperson"><span class="slider"></span></label>
+    </div>
+    <button class="btn-primary btn-full" onclick="addTemplateItem()">+ Hinzufügen</button>
   </div>
 </div>
 
+<!-- FERIEN DETAIL -->
 <div id="screen-trip" class="screen">
   <div class="topbar">
     <button class="btn-sm" onclick="goHome()">← Zurück</button>
@@ -188,7 +225,7 @@ input:focus,select:focus{border-color:var(--accent)}
     <button class="btn-sm btn-danger" onclick="deleteTrip()">🗑</button>
   </div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:0.5rem;align-items:center">
-    <div id="trip-member-pills" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
+    <div id="trip-member-pills" style="display:flex;gap:4px;flex-wrap:wrap;flex:1"></div>
     <button class="btn-sm" onclick="resetTripChecks()">↺ Reset</button>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="trip-progress" style="width:0%"></div></div>
@@ -202,7 +239,7 @@ input:focus,select:focus{border-color:var(--accent)}
 
 </div>
 <script>
-const SQL=`-- Bestehende Tabellen löschen (sicherer Neustart)
+const SQL=`-- Bestehende Tabellen löschen
 drop table if exists item_checks cascade;
 drop table if exists trip_items cascade;
 drop table if exists trip_members cascade;
@@ -213,13 +250,48 @@ drop table if exists family_members cascade;
 drop table if exists items cascade;
 
 -- Neue Tabellen
-create table family_members (id uuid default gen_random_uuid() primary key, name text not null, color int default 0, created_at timestamptz default now());
-create table templates (id uuid default gen_random_uuid() primary key, name text not null, created_at timestamptz default now());
-create table template_items (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id) on delete cascade, name text not null, created_at timestamptz default now());
-create table trips (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id), name text not null, created_at timestamptz default now());
-create table trip_members (id uuid default gen_random_uuid() primary key, trip_id uuid references trips(id) on delete cascade, member_id uuid references family_members(id) on delete cascade, unique(trip_id, member_id));
-create table trip_items (id uuid default gen_random_uuid() primary key, trip_id uuid references trips(id) on delete cascade, name text not null, created_at timestamptz default now());
-create table item_checks (id uuid default gen_random_uuid() primary key, trip_item_id uuid references trip_items(id) on delete cascade, member_id uuid references family_members(id) on delete cascade, unique(trip_item_id, member_id));
+create table family_members (
+  id uuid default gen_random_uuid() primary key,
+  name text not null, color int default 0,
+  created_at timestamptz default now()
+);
+create table templates (
+  id uuid default gen_random_uuid() primary key,
+  name text not null, created_at timestamptz default now()
+);
+create table template_items (
+  id uuid default gen_random_uuid() primary key,
+  template_id uuid references templates(id) on delete cascade,
+  name text not null,
+  qty int default 1,
+  per_person boolean default false,
+  created_at timestamptz default now()
+);
+create table trips (
+  id uuid default gen_random_uuid() primary key,
+  template_id uuid references templates(id),
+  name text not null, created_at timestamptz default now()
+);
+create table trip_members (
+  id uuid default gen_random_uuid() primary key,
+  trip_id uuid references trips(id) on delete cascade,
+  member_id uuid references family_members(id) on delete cascade,
+  unique(trip_id, member_id)
+);
+create table trip_items (
+  id uuid default gen_random_uuid() primary key,
+  trip_id uuid references trips(id) on delete cascade,
+  name text not null,
+  qty int default 1,
+  per_person boolean default false,
+  created_at timestamptz default now()
+);
+create table item_checks (
+  id uuid default gen_random_uuid() primary key,
+  trip_item_id uuid references trip_items(id) on delete cascade,
+  member_id uuid references family_members(id) on delete cascade,
+  unique(trip_item_id, member_id)
+);
 
 -- Sicherheit
 alter table family_members enable row level security;
@@ -272,8 +344,7 @@ function lockApp(){clearInterval(pollTimer);showScreen('lock')}
 
 function showSetup(){
   clearInterval(pollTimer);
-  const ok=SB_URL&&SB_KEY&&PW_HASH;
-  document.getElementById('setup-back-btn').style.display=ok?'':'none';
+  document.getElementById('setup-back-btn').style.display=(SB_URL&&SB_KEY&&PW_HASH)?'':'none';
   showScreen('setup');
 }
 function showSetupFromHome(){showSetup()}
@@ -291,8 +362,7 @@ async function connectSupabase(){
   try{
     await sbFetch('family_members?limit=1');
     const h=await hashPw(pw);
-    ls('sb_url',SB_URL);ls('sb_key',SB_KEY);ls('pw_hash',h);
-    PW_HASH=h;
+    ls('sb_url',SB_URL);ls('sb_key',SB_KEY);ls('pw_hash',h);PW_HASH=h;
     showMsg('setup-msg','✓ Verbunden!',false);
     setTimeout(goHome,500);
   }catch(e){showMsg('setup-msg','Fehler: '+e.message.slice(0,150),true)}
@@ -303,7 +373,7 @@ async function sbFetch(path,opts={}){
     headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
     ...opts
   });
-  if(!res.ok)throw new Error(await res.text());
+  if(!res.ok){const t=await res.text();throw new Error(t)}
   const t=await res.text();return t?JSON.parse(t):[];
 }
 
@@ -312,12 +382,10 @@ function showScreen(id){
   document.getElementById('screen-'+id).classList.add('active');
   window.scrollTo(0,0);
 }
-
 function goHome(){
   clearInterval(pollTimer);currentTrip=null;currentTemplate=null;lastSig='';
   showScreen('home');loadCurrentTab();
 }
-
 let currentTab='trips';
 function switchTab(tab){
   currentTab=tab;
@@ -333,7 +401,7 @@ function loadCurrentTab(){
   else loadFamily();
 }
 
-// Familie
+// ── Familie ──────────────────────────────────────────
 async function loadFamily(){
   const list=document.getElementById('family-list');
   list.innerHTML='<div class="empty">⏳</div>';
@@ -341,9 +409,9 @@ async function loadFamily(){
   if(!allMembers.length){list.innerHTML='<div class="empty"><div class="empty-ico">👨‍👩‍👧</div>Noch keine Familienmitglieder.</div>';return}
   list.innerHTML='';
   allMembers.forEach((m,i)=>{
-    const row=document.createElement('div');row.className='row';
     const ci=m.color!==undefined?m.color:i%8;
-    row.innerHTML=`<div class="av ${COLORS[ci]}">${ini(m.name)}</div><span style="flex:1;font-size:15px">${esc(m.name)}</span><button class="btn-icon btn-danger" onclick="deleteMember('${m.id}')">✕</button>`;
+    const row=document.createElement('div');row.className='row';
+    row.innerHTML=`<div class="av ${COLORS[ci]}" style="cursor:default">${ini3(m.name)}</div><span style="flex:1">${esc(m.name)}</span><button class="btn-icon btn-danger" onclick="deleteMember('${m.id}')">✕</button>`;
     list.appendChild(row);
   });
 }
@@ -360,7 +428,7 @@ async function deleteMember(id){
   await sbFetch('family_members?id=eq.'+id,{method:'DELETE'});loadFamily();
 }
 
-// Vorlagen
+// ── Vorlagen ─────────────────────────────────────────
 async function loadTemplates(){
   const list=document.getElementById('templates-list');
   list.innerHTML='<div class="empty">⏳</div>';
@@ -388,19 +456,32 @@ async function openTemplate(t){
 async function loadTemplateItems(){
   const list=document.getElementById('tpl-items-list');
   const items=await sbFetch('template_items?template_id=eq.'+currentTemplate.id+'&order=created_at.asc');
-  if(!items.length){list.innerHTML='<div class="empty" style="padding:1rem 0">Noch keine Artikel.</div>';return}
+  if(!items.length){list.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted)">Noch keine Artikel.</div>';return}
   list.innerHTML='';
   items.forEach(item=>{
-    const row=document.createElement('div');row.className='item-row';
-    row.innerHTML=`<span class="item-name">${esc(item.name)}</span><button class="btn-icon btn-danger" onclick="deleteTplItem('${item.id}')">✕</button>`;
+    const row=document.createElement('div');row.className='tpl-item-row';
+    const meta=[];
+    if(item.qty>1)meta.push('×'+item.qty);
+    if(item.per_person)meta.push('<span class="badge badge-blue">pro Person</span>');
+    else meta.push('<span class="badge badge-green" style="background:#f0ede8;color:#555">allgemein</span>');
+    row.innerHTML=`
+      <div style="flex:1">
+        <div style="font-size:15px">${esc(item.name)}</div>
+        <div style="font-size:12px;margin-top:2px;display:flex;gap:5px;align-items:center">${meta.join(' ')}</div>
+      </div>
+      <button class="btn-icon btn-danger" onclick="deleteTplItem('${item.id}')">✕</button>`;
     list.appendChild(row);
   });
 }
 async function addTemplateItem(){
   const inp=document.getElementById('new-tpl-item');
   const name=inp.value.trim();if(!name||!currentTemplate)return;
+  const qty=parseInt(document.getElementById('new-tpl-qty').value)||1;
+  const per_person=document.getElementById('new-tpl-perperson').checked;
   inp.value='';
-  await sbFetch('template_items',{method:'POST',body:JSON.stringify({template_id:currentTemplate.id,name})});
+  document.getElementById('new-tpl-qty').value='1';
+  document.getElementById('new-tpl-perperson').checked=false;
+  await sbFetch('template_items',{method:'POST',body:JSON.stringify({template_id:currentTemplate.id,name,qty,per_person})});
   loadTemplateItems();
 }
 document.getElementById('new-tpl-item').addEventListener('keydown',e=>{if(e.key==='Enter')addTemplateItem()});
@@ -410,24 +491,23 @@ async function deleteTemplate(){
   await sbFetch('templates?id=eq.'+currentTemplate.id,{method:'DELETE'});goHome();
 }
 
-// Ferien
+// ── Ferien ───────────────────────────────────────────
 async function loadTrips(){
   const list=document.getElementById('trips-list');
   list.innerHTML='<div class="empty">⏳</div>';
   const trips=await sbFetch('trips?order=created_at.desc');
-  if(!trips.length){list.innerHTML='<div class="empty"><div class="empty-ico">🏖</div>Noch keine Ferienlisten.<br>Erstelle deine erste!</div>';return}
+  if(!trips.length){list.innerHTML='<div class="empty"><div class="empty-ico">🏖</div>Noch keine Ferienlisten.</div>';return}
   const membersData=await Promise.all(trips.map(t=>sbFetch('trip_members?trip_id=eq.'+t.id+'&select=member_id,family_members(id,name,color)')));
   const itemsData=await Promise.all(trips.map(t=>sbFetch('trip_items?trip_id=eq.'+t.id+'&select=id')));
   list.innerHTML='';
   trips.forEach((t,i)=>{
     const members=membersData[i].map(m=>m.family_members).filter(Boolean);
     const card=document.createElement('div');card.className='card';card.style.cursor='pointer';
-    const avatars=members.map((m,j)=>`<div class="av ${COLORS[m.color!==undefined?m.color:j%8]}" style="width:26px;height:26px;font-size:10px;cursor:default">${ini(m.name)}</div>`).join('');
+    const avatars=members.map((m,j)=>`<div class="av av-sm ${COLORS[m.color!==undefined?m.color:j%8]}" style="cursor:default">${ini3(m.name)}</div>`).join('');
     card.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">🏖</span><div style="flex:1"><div style="font-weight:600">${esc(t.name)}</div><div style="font-size:12px;color:var(--muted)">${itemsData[i].length} Artikel</div></div><span style="color:var(--muted)">›</span></div>${members.length?'<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">'+avatars+'</div>':''}`;
     card.onclick=()=>openTrip(t);list.appendChild(card);
   });
 }
-
 async function showCreateTrip(){
   const [templates,members]=await Promise.all([sbFetch('templates?order=name.asc'),sbFetch('family_members?order=created_at.asc')]);
   allMembers=members;
@@ -437,7 +517,7 @@ async function showCreateTrip(){
   const grid=document.getElementById('trip-member-select');grid.innerHTML='';
   members.forEach((m,i)=>{
     const chip=document.createElement('div');chip.className='member-chip';chip.dataset.id=m.id;
-    chip.innerHTML=`<div class="av ${COLORS[m.color!==undefined?m.color:i%8]}" style="width:24px;height:24px;font-size:10px;cursor:default">${ini(m.name)}</div>${esc(m.name)}`;
+    chip.innerHTML=`<div class="av av-sm ${COLORS[m.color!==undefined?m.color:i%8]}" style="cursor:default">${ini3(m.name)}</div>${esc(m.name)}`;
     chip.onclick=()=>chip.classList.toggle('selected');
     grid.appendChild(chip);
   });
@@ -445,7 +525,6 @@ async function showCreateTrip(){
   document.getElementById('new-trip-name').focus();
 }
 function hideCreateTrip(){document.getElementById('create-trip-box').style.display='none';document.getElementById('new-trip-name').value=''}
-
 async function createTrip(){
   const name=document.getElementById('new-trip-name').value.trim();if(!name)return;
   const tplId=document.getElementById('new-trip-template').value||null;
@@ -454,18 +533,16 @@ async function createTrip(){
   if(selMembers.length)await Promise.all(selMembers.map(mid=>sbFetch('trip_members',{method:'POST',body:JSON.stringify({trip_id:trip.id,member_id:mid})})));
   if(tplId){
     const tplItems=await sbFetch('template_items?template_id=eq.'+tplId+'&order=created_at.asc');
-    if(tplItems.length)await Promise.all(tplItems.map(item=>sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:trip.id,name:item.name})})));
+    if(tplItems.length)await Promise.all(tplItems.map(item=>sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:trip.id,name:item.name,qty:item.qty||1,per_person:item.per_person||false})})));
   }
   hideCreateTrip();loadTrips();
 }
-
 async function openTrip(t){
   currentTrip=t;document.getElementById('trip-title').textContent=t.name;
   showScreen('trip');lastSig='';
   await loadTripData();
   clearInterval(pollTimer);pollTimer=setInterval(loadTripData,3000);
 }
-
 async function loadTripData(){
   if(!currentTrip)return;
   try{
@@ -482,21 +559,28 @@ async function loadTripData(){
     const sig=JSON.stringify({items,checks,tripMembers});
     if(sig===lastSig)return;lastSig=sig;
     renderTripMembers();renderTripItems(items,checks);
-  }catch(e){}
+  }catch(e){console.error(e)}
 }
-
 function renderTripMembers(){
   const pills=document.getElementById('trip-member-pills');pills.innerHTML='';
   tripMembers.forEach((m,i)=>{
-    const av=document.createElement('div');av.className='av '+COLORS[m.color!==undefined?m.color:i%8];
-    av.style.cursor='default';av.title=m.name;av.textContent=ini(m.name);pills.appendChild(av);
+    const av=document.createElement('div');
+    av.className='av '+COLORS[m.color!==undefined?m.color:i%8];
+    av.style.cursor='default';av.title=m.name;av.textContent=ini3(m.name);
+    pills.appendChild(av);
   });
 }
-
 function renderTripItems(items,checks){
   const checkSet=new Set(checks.map(c=>c.trip_item_id+'_'+c.member_id));
   const total=items.length;
-  const done=items.filter(item=>tripMembers.length>0&&tripMembers.every(m=>checkSet.has(item.id+'_'+m.id))).length;
+  const done=items.filter(item=>{
+    if(item.per_person){
+      return tripMembers.length>0&&tripMembers.every(m=>checkSet.has(item.id+'_'+m.id));
+    }else{
+      // allgemein: abgehakt wenn mindestens 1 person abhakt
+      return tripMembers.some(m=>checkSet.has(item.id+'_'+m.id))||checks.some(c=>c.trip_item_id===item.id);
+    }
+  }).length;
   const pct=total?Math.round(done/total*100):0;
   document.getElementById('trip-progress').style.width=pct+'%';
   document.getElementById('trip-progress-label').textContent=done+' von '+total+' vollständig gepackt';
@@ -504,50 +588,106 @@ function renderTripItems(items,checks){
   if(!items.length){list.innerHTML='<div class="empty" style="padding:1rem 0">Noch keine Artikel!</div>';return}
   list.innerHTML='';
   items.forEach(item=>{
-    const allChecked=tripMembers.length>0&&tripMembers.every(m=>checkSet.has(item.id+'_'+m.id));
     const row=document.createElement('div');row.className='item-row';
-    const avs=tripMembers.map((m,i)=>{
-      const checked=checkSet.has(item.id+'_'+m.id);
-      const cls=checked?COLORS[m.color!==undefined?m.color:i%8]:'';
-      const style=checked?'':'background:var(--bg);color:var(--muted);border-color:var(--border)';
-      return `<div class="av ${cls}" style="${style}" onclick="toggleCheck('${item.id}','${m.id}',${checked})" title="${esc(m.name)}">${ini(m.name)}</div>`;
-    }).join('');
-    row.innerHTML=`<span class="item-name${allChecked?' done':''}">${esc(item.name)}</span><div class="checker">${avs}</div><button class="btn-icon btn-danger" onclick="deleteTripItem('${item.id}')">✕</button>`;
+    let avHtml='';
+    let isDone=false;
+    if(item.per_person){
+      // Jede Person hat eigenen Avatar
+      avHtml=tripMembers.map((m,i)=>{
+        const checked=checkSet.has(item.id+'_'+m.id);
+        const cls=COLORS[m.color!==undefined?m.color:i%8];
+        return `<div class="av ${checked?cls:'av-unchecked'}" 
+          data-item="${item.id}" data-member="${m.id}" data-checked="${checked}"
+          onclick="toggleCheck('${item.id}','${m.id}',${checked})"
+          title="${esc(m.name)}">${ini3(m.name)}</div>`;
+      }).join('');
+      isDone=tripMembers.length>0&&tripMembers.every(m=>checkSet.has(item.id+'_'+m.id));
+    }else{
+      // Allgemein: ein einziger Haken (erster verfügbarer Member oder general check)
+      const anyChecked=tripMembers.some(m=>checkSet.has(item.id+'_'+m.id));
+      const checkMemberId=tripMembers.length>0?tripMembers[0].id:'GENERAL';
+      const m0=tripMembers[0];
+      const cls=m0?COLORS[m0.color!==undefined?m0.color:0]:'c0';
+      avHtml=`<div class="av ${anyChecked?cls:'av-unchecked'}" 
+        onclick="toggleGeneral('${item.id}',${anyChecked})"
+        style="min-width:60px;font-size:11px"
+        title="Abhaken">${anyChecked?'✓ Erledigt':'Abhaken'}</div>`;
+      isDone=anyChecked;
+    }
+    const meta=[];
+    if(item.qty>1)meta.push('<span style="font-size:11px;color:var(--muted)">×'+item.qty+'</span>');
+    if(item.per_person)meta.push('<span class="badge badge-blue" style="font-size:10px">pro Person</span>');
+    row.innerHTML=`
+      <div style="flex:1">
+        <div class="item-name${isDone?' done':''}">${esc(item.name)}</div>
+        ${meta.length?'<div style="display:flex;gap:4px;align-items:center;margin-top:2px">'+meta.join('')+'</div>':''}
+      </div>
+      <div class="checker">${avHtml}</div>
+      <button class="btn-icon btn-danger" onclick="deleteTripItem('${item.id}')">✕</button>`;
     list.appendChild(row);
   });
 }
-
 async function toggleCheck(itemId,memberId,checked){
   try{
-    if(checked)await sbFetch('item_checks?trip_item_id=eq.'+itemId+'&member_id=eq.'+memberId,{method:'DELETE'});
-    else await sbFetch('item_checks',{method:'POST',body:JSON.stringify({trip_item_id:itemId,member_id:memberId}),headers:{'Prefer':'return=minimal'}});
+    if(checked){
+      await sbFetch('item_checks?trip_item_id=eq.'+itemId+'&member_id=eq.'+memberId,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+    }else{
+      await sbFetch('item_checks',{method:'POST',body:JSON.stringify({trip_item_id:itemId,member_id:memberId}),headers:{'Prefer':'return=minimal'}});
+    }
     lastSig='';loadTripData();
-  }catch(e){}
+  }catch(e){console.error(e)}
+}
+async function toggleGeneral(itemId,anyChecked){
+  try{
+    if(anyChecked){
+      // Remove all checks for this item
+      const checks=await sbFetch('item_checks?trip_item_id=eq.'+itemId+'&select=id');
+      await Promise.all(checks.map(c=>sbFetch('item_checks?id=eq.'+c.id,{method:'DELETE',headers:{'Prefer':'return=minimal'}})));
+    }else{
+      // Check for first member (or all members for general items)
+      const mid=tripMembers.length>0?tripMembers[0].id:null;
+      if(mid)await sbFetch('item_checks',{method:'POST',body:JSON.stringify({trip_item_id:itemId,member_id:mid}),headers:{'Prefer':'return=minimal'}});
+    }
+    lastSig='';loadTripData();
+  }catch(e){console.error(e)}
 }
 async function addTripItem(){
   const inp=document.getElementById('new-trip-item');
   const name=inp.value.trim();if(!name||!currentTrip)return;
   inp.value='';
-  await sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:currentTrip.id,name})});
+  await sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:currentTrip.id,name,qty:1,per_person:false})});
   lastSig='';loadTripData();
 }
 document.getElementById('new-trip-item').addEventListener('keydown',e=>{if(e.key==='Enter')addTripItem()});
-async function deleteTripItem(id){await sbFetch('trip_items?id=eq.'+id,{method:'DELETE'});lastSig='';loadTripData()}
+async function deleteTripItem(id){
+  await sbFetch('trip_items?id=eq.'+id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+  lastSig='';loadTripData();
+}
 async function deleteTrip(){
   if(!confirm('Ferienliste "'+currentTrip.name+'" löschen?'))return;
-  await sbFetch('trips?id=eq.'+currentTrip.id,{method:'DELETE'});goHome();
+  await sbFetch('trips?id=eq.'+currentTrip.id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});goHome();
 }
 async function resetTripChecks(){
   if(!confirm('Alle Häkchen zurücksetzen?'))return;
   const items=await sbFetch('trip_items?trip_id=eq.'+currentTrip.id+'&select=id');
-  await Promise.all(items.map(i=>sbFetch('item_checks?trip_item_id=eq.'+i.id,{method:'DELETE'})));
+  if(items.length){
+    const ids=items.map(i=>i.id).join(',');
+    await sbFetch('item_checks?trip_item_id=in.('+ids+')',{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+  }
   lastSig='';loadTripData();
 }
 
 function showMsg(id,txt,err){const el=document.getElementById(id);el.textContent=txt;el.className='msg'+(err?' err':' ok')}
 function copySQL(){navigator.clipboard.writeText(SQL).then(()=>alert('SQL kopiert!')).catch(()=>prompt('SQL:',SQL))}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function ini(n){return(n||'?').trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+
+// 3-letter initials: take first 3 chars of first word, or first char of each word
+function ini3(n){
+  const parts=(n||'?').trim().split(/\s+/);
+  if(parts.length>=3)return parts.map(w=>w[0]).join('').toUpperCase().slice(0,3);
+  if(parts.length===2)return (parts[0].slice(0,2)+parts[1][0]).toUpperCase();
+  return parts[0].slice(0,3).toUpperCase();
+}
 
 init();
 </script>
