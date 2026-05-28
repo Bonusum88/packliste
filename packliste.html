@@ -2,498 +2,552 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Packliste</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #f7f6f2;
-    --surface: #ffffff;
-    --border: #e8e5de;
-    --text: #1a1a1a;
-    --muted: #888;
-    --accent: #2d6a4f;
-    --accent2: #1a4a8a;
-    --danger: #c0392b;
-    --radius: 12px;
-    --font: 'Segoe UI', system-ui, sans-serif;
-  }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
-  .app { max-width: 480px; margin: 0 auto; padding: 1rem; }
-
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  .topbar { display: flex; align-items: center; gap: 10px; padding: 0.75rem 0 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
-  .topbar h1 { font-size: 18px; font-weight: 600; flex: 1; }
-  .topbar .sub { font-size: 13px; color: var(--muted); }
-
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 10px; }
-
-  button { font-family: var(--font); cursor: pointer; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; padding: 8px 14px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-  button:hover { background: var(--bg); }
-  button:active { transform: scale(0.97); }
-  .btn-primary { background: var(--text); color: var(--surface); border-color: transparent; }
-  .btn-primary:hover { opacity: 0.85; background: var(--text); }
-  .btn-danger { color: var(--danger); border-color: #f5c6c2; }
-  .btn-danger:hover { background: #fdf0ef; }
-  .btn-full { width: 100%; justify-content: center; }
-  .btn-sm { padding: 5px 10px; font-size: 13px; }
-
-  input[type=text], input[type=password] {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
-    background: var(--surface); color: var(--text); font-size: 15px; font-family: var(--font);
-    margin-bottom: 10px; outline: none; transition: border 0.15s;
-  }
-  input:focus { border-color: var(--accent); }
-
-  .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
-
-  .template-row { display: flex; align-items: center; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
-  .template-row:last-child { border-bottom: none; }
-  .template-row:hover .tname { color: var(--accent); }
-  .tname { font-size: 16px; flex: 1; font-weight: 500; }
-  .tcount { font-size: 12px; color: var(--muted); }
-  .ticon { font-size: 20px; }
-  .tchev { font-size: 14px; color: var(--muted); }
-
-  .item-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .item-row:last-child { border-bottom: none; }
-  .item-name { flex: 1; font-size: 15px; }
-  .item-name.done { text-decoration: line-through; color: var(--muted); }
-
-  .checker { display: flex; gap: 6px; }
-  .av { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--muted); transition: all 0.15s; user-select: none; }
-  .av.c1 { background: #dbeafe; color: #1a4a8a; border-color: #93c5fd; }
-  .av.c2 { background: #d1fae5; color: #1a5c3a; border-color: #6ee7b7; }
-
-  .progress-wrap { margin: 0.5rem 0 0.75rem; }
-  .progress-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
-  .progress-label { font-size: 12px; color: var(--muted); margin-top: 5px; }
-
-  .add-row { display: flex; gap: 8px; margin-top: 0.75rem; }
-  .add-row input { flex: 1; margin-bottom: 0; }
-
-  .msg { font-size: 13px; color: var(--muted); margin-top: 8px; min-height: 18px; padding: 6px 0; }
-  .msg.err { color: var(--danger); }
-  .msg.ok { color: var(--accent); }
-
-  .setup-step { background: var(--bg); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
-  .setup-step p { font-size: 14px; color: #444; line-height: 1.6; }
-  .step-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--text); color: var(--surface); font-size: 11px; font-weight: 600; margin-right: 6px; }
-  .sql-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 8px; font-family: monospace; font-size: 11px; color: #555; line-height: 1.6; word-break: break-all; }
-
-  .legend { display: flex; gap: 10px; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; }
-  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-  .pill-blue { background: #dbeafe; color: #1a4a8a; }
-  .pill-green { background: #d1fae5; color: #1a5c3a; }
-  .spacer { flex: 1; }
-
-  .empty { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 15px; }
-  .empty .ico { font-size: 40px; margin-bottom: 0.5rem; }
-
-  .footer-btns { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f5f4f0;--surface:#ffffff;--border:#e2dfd8;--text:#1c1c1c;--muted:#8a8a8a;
+  --accent:#2d6a4f;--accent-bg:#e8f5ee;--blue:#1a4a8a;--blue-bg:#dbeafe;
+  --danger:#c0392b;--danger-bg:#fdf0ef;
+  --radius:12px;--font:'Segoe UI',system-ui,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+.app{max-width:480px;margin:0 auto;padding:1rem}
+.screen{display:none}.screen.active{display:block}
+.topbar{display:flex;align-items:center;gap:10px;padding:0.6rem 0 0.9rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.topbar h1{font-size:17px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button{font-family:var(--font);cursor:pointer;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;padding:8px 14px;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+button:hover{background:var(--bg)}button:active{transform:scale(0.97)}
+.btn-primary{background:var(--text);color:var(--surface);border-color:transparent}
+.btn-primary:hover{opacity:0.85;background:var(--text)}
+.btn-danger{color:var(--danger);border-color:#f5c6c2}.btn-danger:hover{background:var(--danger-bg)}
+.btn-full{width:100%;justify-content:center}.btn-sm{padding:5px 10px;font-size:13px}
+.btn-icon{padding:5px 8px;font-size:16px;border:none;background:transparent;color:var(--muted)}
+.btn-icon:hover{color:var(--text);background:var(--bg)}
+input[type=text],input[type=password],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:15px;font-family:var(--font);margin-bottom:10px;outline:none;transition:border 0.15s}
+input:focus,select:focus{border-color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:10px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:12px}
+.label{font-size:11px;color:var(--muted);margin-bottom:4px;display:block;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.row{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.av{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;user-select:none;flex-shrink:0}
+.c0{background:#dbeafe;color:#1a4a8a;border-color:#93c5fd}
+.c1{background:#d1fae5;color:#1a5c3a;border-color:#6ee7b7}
+.c2{background:#fce7f3;color:#831843;border-color:#f9a8d4}
+.c3{background:#fef3c7;color:#78350f;border-color:#fcd34d}
+.c4{background:#ede9fe;color:#4c1d95;border-color:#c4b5fd}
+.c5{background:#fee2e2;color:#7f1d1d;border-color:#fca5a5}
+.c6{background:#ecfdf5;color:#064e3b;border-color:#6ee7b7}
+.c7{background:#fff7ed;color:#7c2d12;border-color:#fdba74}
+.progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0 3px}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s}
+.progress-label{font-size:12px;color:var(--muted)}
+.add-row{display:flex;gap:8px;margin-top:0.75rem}
+.add-row input{flex:1;margin-bottom:0}
+.msg{font-size:13px;padding:6px 0;min-height:20px}
+.msg.err{color:var(--danger)}.msg.ok{color:var(--accent)}
+.setup-step{background:var(--bg);border-radius:10px;padding:0.9rem;margin-bottom:8px;font-size:14px;color:#444;line-height:1.6}
+.step-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--text);color:var(--surface);font-size:11px;font-weight:700;margin-right:6px}
+.sql-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px;font-family:monospace;font-size:10px;color:#555;line-height:1.6;word-break:break-all;white-space:pre-wrap;max-height:150px;overflow-y:auto}
+.member-grid{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.member-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);cursor:pointer;font-size:14px;transition:all 0.15s;background:var(--surface)}
+.member-chip.selected{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:600}
+.item-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.item-row:last-child{border-bottom:none}
+.item-name{flex:1;font-size:15px}.item-name.done{text-decoration:line-through;color:var(--muted)}
+.checker{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px}
+.tab{flex:1;text-align:center;padding:7px 4px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.15s}
+.tab.active{background:var(--text);color:var(--surface)}
+.lock-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:1rem}
+.empty{text-align:center;padding:2rem 1rem;color:var(--muted)}
+.empty-ico{font-size:36px;margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Setup Screen -->
-  <div id="screen-setup" class="screen active">
-    <div class="topbar">
-      <span style="font-size:24px">🎒</span>
-      <h1>Packlisten-App</h1>
+<div id="screen-lock" class="screen active">
+  <div class="lock-wrap">
+    <div style="font-size:48px">🔒</div>
+    <div style="font-size:20px;font-weight:600">Packlisten-App</div>
+    <div style="font-size:14px;color:var(--muted)">Bitte Passwort eingeben</div>
+    <div style="width:100%;max-width:300px">
+      <input type="password" id="lock-pw" placeholder="Passwort" style="text-align:center;font-size:18px;letter-spacing:2px">
+      <button class="btn-primary btn-full" onclick="checkLock()">Entsperren</button>
+      <div id="lock-msg" class="msg" style="text-align:center"></div>
     </div>
-
-    <div class="card">
-      <p style="font-size:15px;font-weight:600;margin-bottom:12px">👤 Eure Namen</p>
-      <span class="label">Dein Name</span>
-      <input type="text" id="name1" placeholder="z.B. Silvan">
-      <span class="label">Name deiner Frau</span>
-      <input type="text" id="name2" placeholder="z.B. Maria">
-    </div>
-
-    <div class="card">
-      <p style="font-size:15px;font-weight:600;margin-bottom:12px">☁️ Supabase verbinden</p>
-
-      <div class="setup-step">
-        <p><span class="step-n">1</span>Gehe zu <strong>supabase.com</strong> → kostenloses Konto erstellen</p>
-      </div>
-      <div class="setup-step">
-        <p><span class="step-n">2</span>Neues Projekt erstellen → Region <strong>Frankfurt</strong></p>
-      </div>
-      <div class="setup-step">
-        <p><span class="step-n">3</span><strong>Project Settings → API</strong> öffnen → URL und anon Key kopieren</p>
-      </div>
-      <div class="setup-step">
-        <p><span class="step-n">4</span><strong>SQL Editor</strong> → neuen Query → SQL einfügen → Run</p>
-        <div class="sql-box" id="sql-display">create table if not exists templates (id uuid default gen_random_uuid() primary key, name text not null, created_at timestamptz default now());
-create table if not exists items (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id) on delete cascade, name text not null, checked_1 boolean default false, checked_2 boolean default false, created_at timestamptz default now());
-alter table templates enable row level security;
-alter table items enable row level security;
-create policy "all" on templates for all using (true);
-create policy "all" on items for all using (true);</div>
-        <button class="btn-sm" onclick="copySQL()" style="margin-top:8px">📋 SQL kopieren</button>
-      </div>
-
-      <span class="label" style="margin-top:4px">Supabase Project URL</span>
-      <input type="text" id="sb-url" placeholder="https://xyz.supabase.co">
-      <span class="label">Supabase Anon Key</span>
-      <input type="password" id="sb-key" placeholder="eyJhbGci...">
-
-      <div id="setup-msg" class="msg"></div>
-      <button class="btn-primary btn-full" onclick="connectSupabase()">🔌 Verbinden & App starten</button>
-    </div>
-
-    <div class="card" style="background:transparent;border-style:dashed">
-      <p style="font-size:13px;color:var(--muted)">Deine Daten werden nur in deinem eigenen Supabase-Projekt gespeichert. Die Verbindungsdaten bleiben lokal auf diesem Gerät.</p>
-    </div>
+    <button class="btn-sm" onclick="showSetup()" style="color:var(--muted);border:none;background:transparent">⚙️ Einstellungen</button>
   </div>
-
-  <!-- Home Screen -->
-  <div id="screen-home" class="screen">
-    <div class="topbar">
-      <span style="font-size:22px">🎒</span>
-      <h1>Vorlagen</h1>
-      <span class="sub" id="home-names"></span>
-    </div>
-
-    <div id="template-list"></div>
-
-    <button class="btn-primary btn-full" style="margin-top:0.75rem" onclick="showNewTemplate()">+ Neue Vorlage</button>
-
-    <div id="new-template-box" style="display:none;margin-top:0.75rem" class="card">
-      <span class="label">Name der Vorlage</span>
-      <input type="text" id="new-tpl-name" placeholder="z.B. Strandferien, Skiferien...">
-      <div style="display:flex;gap:8px">
-        <button class="btn-primary" onclick="createTemplate()">Erstellen</button>
-        <button onclick="hideNewTemplate()">Abbrechen</button>
-      </div>
-    </div>
-
-    <div class="footer-btns">
-      <button class="btn-sm" onclick="showSetup()">⚙️ Einstellungen</button>
-    </div>
-  </div>
-
-  <!-- List Screen -->
-  <div id="screen-list" class="screen">
-    <div class="topbar">
-      <button class="btn-sm" onclick="goHome()">← Zurück</button>
-      <h1 id="list-title">Vorlage</h1>
-      <button class="btn-sm btn-danger" onclick="deleteTemplate()">🗑</button>
-    </div>
-
-    <div class="legend">
-      <span class="pill pill-blue" id="legend-1">P1</span>
-      <span class="pill pill-green" id="legend-2">P2</span>
-      <div class="spacer"></div>
-      <button class="btn-sm" onclick="resetChecks()">↺ Reset</button>
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-      <div class="progress-label" id="progress-label">0 von 0 vollständig gepackt</div>
-    </div>
-
-    <div class="card" style="padding:0.5rem 1rem">
-      <div id="items-list"></div>
-    </div>
-
-    <div class="add-row">
-      <input type="text" id="new-item-name" placeholder="Artikel hinzufügen...">
-      <button class="btn-primary" onclick="addItem()">+</button>
-    </div>
-  </div>
-
 </div>
 
+<div id="screen-setup" class="screen">
+  <div class="topbar">
+    <span style="font-size:22px">🎒</span>
+    <h1>Einrichtung</h1>
+    <button class="btn-sm" id="setup-back-btn" onclick="goHome()" style="display:none">← Zurück</button>
+  </div>
+  <div class="card">
+    <div class="card-title">🔒 Passwortschutz</div>
+    <span class="label">App-Passwort (für alle Familienmitglieder gleich)</span>
+    <input type="password" id="setup-pw" placeholder="Passwort wählen">
+    <span class="label">Passwort wiederholen</span>
+    <input type="password" id="setup-pw2" placeholder="Passwort wiederholen">
+  </div>
+  <div class="card">
+    <div class="card-title">☁️ Supabase verbinden</div>
+    <div class="setup-step"><span class="step-n">1</span>Gehe zu <strong>supabase.com</strong> → kostenloses Konto erstellen</div>
+    <div class="setup-step"><span class="step-n">2</span>Neues Projekt → Region <strong>Frankfurt (eu-central-1)</strong></div>
+    <div class="setup-step"><span class="step-n">3</span><strong>Project Settings → API</strong> → URL + anon Key kopieren</div>
+    <div class="setup-step">
+      <span class="step-n">4</span><strong>SQL Editor</strong> → SQL einfügen → Run
+      <div class="sql-box" id="sql-display"></div>
+      <button class="btn-sm" onclick="copySQL()" style="margin-top:8px">📋 SQL kopieren</button>
+    </div>
+    <span class="label" style="margin-top:4px">Supabase Project URL</span>
+    <input type="text" id="sb-url" placeholder="https://xyz.supabase.co">
+    <span class="label">Supabase Anon Key</span>
+    <input type="password" id="sb-key" placeholder="eyJhbGci...">
+    <div id="setup-msg" class="msg"></div>
+    <button class="btn-primary btn-full" onclick="connectSupabase()">🔌 Verbinden & starten</button>
+  </div>
+</div>
+
+<div id="screen-home" class="screen">
+  <div class="topbar">
+    <span style="font-size:20px">🎒</span>
+    <h1>Packliste</h1>
+    <button class="btn-icon" onclick="lockApp()" title="Sperren">🔒</button>
+    <button class="btn-icon" onclick="showSetupFromHome()" title="Einstellungen">⚙️</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="tab-trips" onclick="switchTab('trips')">🏖 Ferien</button>
+    <button class="tab" id="tab-templates" onclick="switchTab('templates')">📋 Vorlagen</button>
+    <button class="tab" id="tab-family" onclick="switchTab('family')">👨‍👩‍👧 Familie</button>
+  </div>
+  <div id="tab-content-trips">
+    <div id="trips-list"></div>
+    <button class="btn-primary btn-full" style="margin-top:4px" onclick="showCreateTrip()">+ Neue Ferienliste</button>
+    <div id="create-trip-box" style="display:none;margin-top:10px" class="card">
+      <div class="card-title">Neue Ferienliste</div>
+      <span class="label">Name (z.B. Strandferien Korsika 2025)</span>
+      <input type="text" id="new-trip-name" placeholder="Ferien 2025...">
+      <span class="label">Vorlage verwenden (optional)</span>
+      <select id="new-trip-template"><option value="">— Keine Vorlage —</option></select>
+      <span class="label">Teilnehmer</span>
+      <div class="member-grid" id="trip-member-select"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn-primary" onclick="createTrip()">Erstellen</button>
+        <button onclick="hideCreateTrip()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+  <div id="tab-content-templates" style="display:none">
+    <div id="templates-list"></div>
+    <button class="btn-primary btn-full" style="margin-top:4px" onclick="showCreateTemplate()">+ Neue Vorlage</button>
+    <div id="create-template-box" style="display:none;margin-top:10px" class="card">
+      <div class="card-title">Neue Vorlage</div>
+      <span class="label">Name (z.B. Strandferien, Skiferien)</span>
+      <input type="text" id="new-tpl-name" placeholder="Vorlage...">
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary" onclick="createTemplate()">Erstellen</button>
+        <button onclick="hideCreateTemplate()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+  <div id="tab-content-family" style="display:none">
+    <div id="family-list"></div>
+    <div class="add-row">
+      <input type="text" id="new-member-name" placeholder="Name eingeben...">
+      <button class="btn-primary" onclick="addMember()">+</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Familienmitglieder können pro Ferienliste ausgewählt werden.</p>
+  </div>
+</div>
+
+<div id="screen-template" class="screen">
+  <div class="topbar">
+    <button class="btn-sm" onclick="goHome()">← Zurück</button>
+    <h1 id="tpl-title">Vorlage</h1>
+    <button class="btn-sm btn-danger" onclick="deleteTemplate()">🗑</button>
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:0.75rem">Artikel werden beim Erstellen einer Ferienliste aus dieser Vorlage kopiert.</p>
+  <div class="card" style="padding:0.5rem 1rem"><div id="tpl-items-list"></div></div>
+  <div class="add-row">
+    <input type="text" id="new-tpl-item" placeholder="Artikel hinzufügen...">
+    <button class="btn-primary" onclick="addTemplateItem()">+</button>
+  </div>
+</div>
+
+<div id="screen-trip" class="screen">
+  <div class="topbar">
+    <button class="btn-sm" onclick="goHome()">← Zurück</button>
+    <h1 id="trip-title">Ferien</h1>
+    <button class="btn-sm btn-danger" onclick="deleteTrip()">🗑</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:0.5rem;align-items:center">
+    <div id="trip-member-pills" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
+    <button class="btn-sm" onclick="resetTripChecks()">↺ Reset</button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="trip-progress" style="width:0%"></div></div>
+  <div class="progress-label" id="trip-progress-label" style="margin-bottom:0.75rem">0 von 0 vollständig gepackt</div>
+  <div class="card" style="padding:0.5rem 1rem"><div id="trip-items-list"></div></div>
+  <div class="add-row">
+    <input type="text" id="new-trip-item" placeholder="Artikel hinzufügen...">
+    <button class="btn-primary" onclick="addTripItem()">+</button>
+  </div>
+</div>
+
+</div>
 <script>
-let SB_URL = '', SB_KEY = '', name1 = '', name2 = '';
-let currentTemplate = null;
-let pollTimer = null;
-let lastItems = '';
+const SQL=`-- Bestehende Tabellen löschen (sicherer Neustart)
+drop table if exists item_checks cascade;
+drop table if exists trip_items cascade;
+drop table if exists trip_members cascade;
+drop table if exists trips cascade;
+drop table if exists template_items cascade;
+drop table if exists templates cascade;
+drop table if exists family_members cascade;
+drop table if exists items cascade;
 
-const SQL = `create table if not exists templates (id uuid default gen_random_uuid() primary key, name text not null, created_at timestamptz default now());
-create table if not exists items (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id) on delete cascade, name text not null, checked_1 boolean default false, checked_2 boolean default false, created_at timestamptz default now());
+-- Neue Tabellen
+create table family_members (id uuid default gen_random_uuid() primary key, name text not null, color int default 0, created_at timestamptz default now());
+create table templates (id uuid default gen_random_uuid() primary key, name text not null, created_at timestamptz default now());
+create table template_items (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id) on delete cascade, name text not null, created_at timestamptz default now());
+create table trips (id uuid default gen_random_uuid() primary key, template_id uuid references templates(id), name text not null, created_at timestamptz default now());
+create table trip_members (id uuid default gen_random_uuid() primary key, trip_id uuid references trips(id) on delete cascade, member_id uuid references family_members(id) on delete cascade, unique(trip_id, member_id));
+create table trip_items (id uuid default gen_random_uuid() primary key, trip_id uuid references trips(id) on delete cascade, name text not null, created_at timestamptz default now());
+create table item_checks (id uuid default gen_random_uuid() primary key, trip_item_id uuid references trip_items(id) on delete cascade, member_id uuid references family_members(id) on delete cascade, unique(trip_item_id, member_id));
+
+-- Sicherheit
+alter table family_members enable row level security;
 alter table templates enable row level security;
-alter table items enable row level security;
+alter table template_items enable row level security;
+alter table trips enable row level security;
+alter table trip_members enable row level security;
+alter table trip_items enable row level security;
+alter table item_checks enable row level security;
+create policy "all" on family_members for all using (true);
 create policy "all" on templates for all using (true);
-create policy "all" on items for all using (true);`;
+create policy "all" on template_items for all using (true);
+create policy "all" on trips for all using (true);
+create policy "all" on trip_members for all using (true);
+create policy "all" on trip_items for all using (true);
+create policy "all" on item_checks for all using (true);`;
 
-function ls(k, v) {
-  if (v === undefined) return localStorage.getItem(k) || '';
-  localStorage.setItem(k, v);
+document.getElementById('sql-display').textContent=SQL;
+
+const COLORS=['c0','c1','c2','c3','c4','c5','c6','c7'];
+let SB_URL='',SB_KEY='',PW_HASH='';
+let currentTrip=null,currentTemplate=null;
+let pollTimer=null,lastSig='';
+let allMembers=[],tripMembers=[];
+
+function ls(k,v){if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v)}
+
+async function hashPw(s){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-function init() {
-  SB_URL = ls('sb_url');
-  SB_KEY = ls('sb_key');
-  name1 = ls('name1');
-  name2 = ls('name2');
-  document.getElementById('sb-url').value = SB_URL;
-  document.getElementById('sb-key').value = SB_KEY;
-  document.getElementById('name1').value = name1;
-  document.getElementById('name2').value = name2;
-  if (SB_URL && SB_KEY && name1 && name2) showHome();
+async function init(){
+  SB_URL=ls('sb_url');SB_KEY=ls('sb_key');PW_HASH=ls('pw_hash');
+  document.getElementById('sb-url').value=SB_URL;
+  document.getElementById('sb-key').value=SB_KEY;
+  if(!SB_URL||!SB_KEY||!PW_HASH){showSetup();return}
+  showScreen('lock');
 }
 
-async function sbFetch(path, opts = {}) {
-  const url = SB_URL.replace(/\/$/, '') + '/rest/v1/' + path;
-  const res = await fetch(url, {
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
-      ...opts.headers
-    },
-    ...opts
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(txt);
-  }
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
+async function checkLock(){
+  const pw=document.getElementById('lock-pw').value;
+  if(!pw){showMsg('lock-msg','Bitte Passwort eingeben',true);return}
+  const h=await hashPw(pw);
+  if(h===PW_HASH){document.getElementById('lock-pw').value='';goHome()}
+  else showMsg('lock-msg','Falsches Passwort ❌',true);
 }
+document.getElementById('lock-pw').addEventListener('keydown',e=>{if(e.key==='Enter')checkLock()});
+function lockApp(){clearInterval(pollTimer);showScreen('lock')}
 
-async function connectSupabase() {
-  const url = document.getElementById('sb-url').value.trim();
-  const key = document.getElementById('sb-key').value.trim();
-  const n1 = document.getElementById('name1').value.trim();
-  const n2 = document.getElementById('name2').value.trim();
-  const msg = document.getElementById('setup-msg');
-
-  if (!n1 || !n2) { showMsg('setup-msg', 'Bitte beide Namen eingeben.', true); return; }
-  if (!url || !key) { showMsg('setup-msg', 'Bitte URL und Anon Key eingeben.', true); return; }
-
-  showMsg('setup-msg', 'Verbindung wird getestet...', false);
-  SB_URL = url.replace(/\/$/, '');
-  SB_KEY = key;
-
-  try {
-    await sbFetch('templates?limit=1');
-    ls('sb_url', SB_URL); ls('sb_key', SB_KEY);
-    ls('name1', n1); ls('name2', n2);
-    name1 = n1; name2 = n2;
-    showMsg('setup-msg', '✓ Verbunden!', false);
-    setTimeout(showHome, 500);
-  } catch(e) {
-    showMsg('setup-msg', 'Fehler: ' + e.message.slice(0, 150), true);
-  }
-}
-
-function showMsg(id, txt, err) {
-  const el = document.getElementById(id);
-  el.textContent = txt;
-  el.className = 'msg' + (err ? ' err' : ' ok');
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-function showSetup() {
+function showSetup(){
   clearInterval(pollTimer);
+  const ok=SB_URL&&SB_KEY&&PW_HASH;
+  document.getElementById('setup-back-btn').style.display=ok?'':'none';
   showScreen('setup');
 }
+function showSetupFromHome(){showSetup()}
 
-function showHome() {
-  clearInterval(pollTimer);
-  showScreen('home');
-  document.getElementById('home-names').textContent = name1 + ' & ' + name2;
-  loadTemplates();
+async function connectSupabase(){
+  const url=document.getElementById('sb-url').value.trim();
+  const key=document.getElementById('sb-key').value.trim();
+  const pw=document.getElementById('setup-pw').value;
+  const pw2=document.getElementById('setup-pw2').value;
+  if(!pw){showMsg('setup-msg','Bitte Passwort eingeben',true);return}
+  if(pw!==pw2){showMsg('setup-msg','Passwörter stimmen nicht überein',true);return}
+  if(!url||!key){showMsg('setup-msg','Bitte URL und Key eingeben',true);return}
+  showMsg('setup-msg','Verbindung wird getestet...',false);
+  SB_URL=url.replace(/\/$/,'');SB_KEY=key;
+  try{
+    await sbFetch('family_members?limit=1');
+    const h=await hashPw(pw);
+    ls('sb_url',SB_URL);ls('sb_key',SB_KEY);ls('pw_hash',h);
+    PW_HASH=h;
+    showMsg('setup-msg','✓ Verbunden!',false);
+    setTimeout(goHome,500);
+  }catch(e){showMsg('setup-msg','Fehler: '+e.message.slice(0,150),true)}
 }
 
-function goHome() {
-  clearInterval(pollTimer);
-  showHome();
+async function sbFetch(path,opts={}){
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok)throw new Error(await res.text());
+  const t=await res.text();return t?JSON.parse(t):[];
 }
 
-async function loadTemplates() {
-  const list = document.getElementById('template-list');
-  list.innerHTML = '<div class="empty"><div>⏳</div>Lädt...</div>';
-  try {
-    const templates = await sbFetch('templates?order=created_at.asc');
-    if (!templates.length) {
-      list.innerHTML = '<div class="empty"><div class="ico">📋</div>Noch keine Vorlagen.<br>Erstelle deine erste!</div>';
-      return;
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome(){
+  clearInterval(pollTimer);currentTrip=null;currentTemplate=null;lastSig='';
+  showScreen('home');loadCurrentTab();
+}
+
+let currentTab='trips';
+function switchTab(tab){
+  currentTab=tab;
+  ['trips','templates','family'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('tab-content-'+t).style.display=t===tab?'block':'none';
+  });
+  loadCurrentTab();
+}
+function loadCurrentTab(){
+  if(currentTab==='trips')loadTrips();
+  else if(currentTab==='templates')loadTemplates();
+  else loadFamily();
+}
+
+// Familie
+async function loadFamily(){
+  const list=document.getElementById('family-list');
+  list.innerHTML='<div class="empty">⏳</div>';
+  allMembers=await sbFetch('family_members?order=created_at.asc');
+  if(!allMembers.length){list.innerHTML='<div class="empty"><div class="empty-ico">👨‍👩‍👧</div>Noch keine Familienmitglieder.</div>';return}
+  list.innerHTML='';
+  allMembers.forEach((m,i)=>{
+    const row=document.createElement('div');row.className='row';
+    const ci=m.color!==undefined?m.color:i%8;
+    row.innerHTML=`<div class="av ${COLORS[ci]}">${ini(m.name)}</div><span style="flex:1;font-size:15px">${esc(m.name)}</span><button class="btn-icon btn-danger" onclick="deleteMember('${m.id}')">✕</button>`;
+    list.appendChild(row);
+  });
+}
+async function addMember(){
+  const inp=document.getElementById('new-member-name');
+  const name=inp.value.trim();if(!name)return;
+  const color=allMembers.length%8;inp.value='';
+  await sbFetch('family_members',{method:'POST',body:JSON.stringify({name,color})});
+  loadFamily();
+}
+document.getElementById('new-member-name').addEventListener('keydown',e=>{if(e.key==='Enter')addMember()});
+async function deleteMember(id){
+  if(!confirm('Mitglied löschen?'))return;
+  await sbFetch('family_members?id=eq.'+id,{method:'DELETE'});loadFamily();
+}
+
+// Vorlagen
+async function loadTemplates(){
+  const list=document.getElementById('templates-list');
+  list.innerHTML='<div class="empty">⏳</div>';
+  const templates=await sbFetch('templates?order=created_at.asc');
+  if(!templates.length){list.innerHTML='<div class="empty"><div class="empty-ico">📋</div>Noch keine Vorlagen.</div>';return}
+  const counts=await Promise.all(templates.map(t=>sbFetch('template_items?template_id=eq.'+t.id+'&select=id')));
+  list.innerHTML='';
+  templates.forEach((t,i)=>{
+    const row=document.createElement('div');row.className='row';row.style.cursor='pointer';
+    row.innerHTML=`<span style="font-size:20px">📋</span><div style="flex:1"><div style="font-weight:600">${esc(t.name)}</div><div style="font-size:12px;color:var(--muted)">${counts[i].length} Artikel</div></div><span style="color:var(--muted)">›</span>`;
+    row.onclick=()=>openTemplate(t);list.appendChild(row);
+  });
+}
+function showCreateTemplate(){document.getElementById('create-template-box').style.display='block';document.getElementById('new-tpl-name').focus()}
+function hideCreateTemplate(){document.getElementById('create-template-box').style.display='none';document.getElementById('new-tpl-name').value=''}
+async function createTemplate(){
+  const name=document.getElementById('new-tpl-name').value.trim();if(!name)return;
+  await sbFetch('templates',{method:'POST',body:JSON.stringify({name})});
+  hideCreateTemplate();loadTemplates();
+}
+async function openTemplate(t){
+  currentTemplate=t;document.getElementById('tpl-title').textContent=t.name;
+  showScreen('template');loadTemplateItems();
+}
+async function loadTemplateItems(){
+  const list=document.getElementById('tpl-items-list');
+  const items=await sbFetch('template_items?template_id=eq.'+currentTemplate.id+'&order=created_at.asc');
+  if(!items.length){list.innerHTML='<div class="empty" style="padding:1rem 0">Noch keine Artikel.</div>';return}
+  list.innerHTML='';
+  items.forEach(item=>{
+    const row=document.createElement('div');row.className='item-row';
+    row.innerHTML=`<span class="item-name">${esc(item.name)}</span><button class="btn-icon btn-danger" onclick="deleteTplItem('${item.id}')">✕</button>`;
+    list.appendChild(row);
+  });
+}
+async function addTemplateItem(){
+  const inp=document.getElementById('new-tpl-item');
+  const name=inp.value.trim();if(!name||!currentTemplate)return;
+  inp.value='';
+  await sbFetch('template_items',{method:'POST',body:JSON.stringify({template_id:currentTemplate.id,name})});
+  loadTemplateItems();
+}
+document.getElementById('new-tpl-item').addEventListener('keydown',e=>{if(e.key==='Enter')addTemplateItem()});
+async function deleteTplItem(id){await sbFetch('template_items?id=eq.'+id,{method:'DELETE'});loadTemplateItems()}
+async function deleteTemplate(){
+  if(!confirm('Vorlage "'+currentTemplate.name+'" löschen?'))return;
+  await sbFetch('templates?id=eq.'+currentTemplate.id,{method:'DELETE'});goHome();
+}
+
+// Ferien
+async function loadTrips(){
+  const list=document.getElementById('trips-list');
+  list.innerHTML='<div class="empty">⏳</div>';
+  const trips=await sbFetch('trips?order=created_at.desc');
+  if(!trips.length){list.innerHTML='<div class="empty"><div class="empty-ico">🏖</div>Noch keine Ferienlisten.<br>Erstelle deine erste!</div>';return}
+  const membersData=await Promise.all(trips.map(t=>sbFetch('trip_members?trip_id=eq.'+t.id+'&select=member_id,family_members(id,name,color)')));
+  const itemsData=await Promise.all(trips.map(t=>sbFetch('trip_items?trip_id=eq.'+t.id+'&select=id')));
+  list.innerHTML='';
+  trips.forEach((t,i)=>{
+    const members=membersData[i].map(m=>m.family_members).filter(Boolean);
+    const card=document.createElement('div');card.className='card';card.style.cursor='pointer';
+    const avatars=members.map((m,j)=>`<div class="av ${COLORS[m.color!==undefined?m.color:j%8]}" style="width:26px;height:26px;font-size:10px;cursor:default">${ini(m.name)}</div>`).join('');
+    card.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">🏖</span><div style="flex:1"><div style="font-weight:600">${esc(t.name)}</div><div style="font-size:12px;color:var(--muted)">${itemsData[i].length} Artikel</div></div><span style="color:var(--muted)">›</span></div>${members.length?'<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">'+avatars+'</div>':''}`;
+    card.onclick=()=>openTrip(t);list.appendChild(card);
+  });
+}
+
+async function showCreateTrip(){
+  const [templates,members]=await Promise.all([sbFetch('templates?order=name.asc'),sbFetch('family_members?order=created_at.asc')]);
+  allMembers=members;
+  const sel=document.getElementById('new-trip-template');
+  sel.innerHTML='<option value="">— Keine Vorlage —</option>';
+  templates.forEach(t=>{sel.innerHTML+=`<option value="${t.id}">${esc(t.name)}</option>`});
+  const grid=document.getElementById('trip-member-select');grid.innerHTML='';
+  members.forEach((m,i)=>{
+    const chip=document.createElement('div');chip.className='member-chip';chip.dataset.id=m.id;
+    chip.innerHTML=`<div class="av ${COLORS[m.color!==undefined?m.color:i%8]}" style="width:24px;height:24px;font-size:10px;cursor:default">${ini(m.name)}</div>${esc(m.name)}`;
+    chip.onclick=()=>chip.classList.toggle('selected');
+    grid.appendChild(chip);
+  });
+  document.getElementById('create-trip-box').style.display='block';
+  document.getElementById('new-trip-name').focus();
+}
+function hideCreateTrip(){document.getElementById('create-trip-box').style.display='none';document.getElementById('new-trip-name').value=''}
+
+async function createTrip(){
+  const name=document.getElementById('new-trip-name').value.trim();if(!name)return;
+  const tplId=document.getElementById('new-trip-template').value||null;
+  const selMembers=[...document.querySelectorAll('#trip-member-select .member-chip.selected')].map(c=>c.dataset.id);
+  const trip=(await sbFetch('trips',{method:'POST',body:JSON.stringify({name,template_id:tplId})}))[0];
+  if(selMembers.length)await Promise.all(selMembers.map(mid=>sbFetch('trip_members',{method:'POST',body:JSON.stringify({trip_id:trip.id,member_id:mid})})));
+  if(tplId){
+    const tplItems=await sbFetch('template_items?template_id=eq.'+tplId+'&order=created_at.asc');
+    if(tplItems.length)await Promise.all(tplItems.map(item=>sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:trip.id,name:item.name})})));
+  }
+  hideCreateTrip();loadTrips();
+}
+
+async function openTrip(t){
+  currentTrip=t;document.getElementById('trip-title').textContent=t.name;
+  showScreen('trip');lastSig='';
+  await loadTripData();
+  clearInterval(pollTimer);pollTimer=setInterval(loadTripData,3000);
+}
+
+async function loadTripData(){
+  if(!currentTrip)return;
+  try{
+    const [membersRaw,items]=await Promise.all([
+      sbFetch('trip_members?trip_id=eq.'+currentTrip.id+'&select=member_id,family_members(id,name,color)'),
+      sbFetch('trip_items?trip_id=eq.'+currentTrip.id+'&order=created_at.asc')
+    ]);
+    tripMembers=membersRaw.map(m=>m.family_members).filter(Boolean);
+    let checks=[];
+    if(items.length){
+      const ids=items.map(i=>'trip_item_id=eq.'+i.id).join(',');
+      checks=await sbFetch('item_checks?or=('+ids+')&select=trip_item_id,member_id');
     }
-    const counts = await Promise.all(templates.map(t =>
-      sbFetch('items?template_id=eq.' + t.id + '&select=id,checked_1,checked_2')
-    ));
-    list.innerHTML = '';
-    templates.forEach((t, i) => {
-      const items = counts[i];
-      const total = items.length;
-      const done = items.filter(x => x.checked_1 && x.checked_2).length;
-      const pct = total ? Math.round(done/total*100) : 0;
-      const row = document.createElement('div');
-      row.className = 'template-row';
-      row.innerHTML = `
-        <span class="ticon">🧳</span>
-        <div style="flex:1">
-          <div class="tname">${esc(t.name)}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${total} Artikel · ${pct}% gepackt</div>
-        </div>
-        <span class="tchev">›</span>`;
-      row.onclick = () => openTemplate(t);
-      list.appendChild(row);
-    });
-  } catch(e) {
-    list.innerHTML = '<div class="empty" style="color:var(--danger)">Fehler: ' + esc(e.message) + '</div>';
-  }
+    const sig=JSON.stringify({items,checks,tripMembers});
+    if(sig===lastSig)return;lastSig=sig;
+    renderTripMembers();renderTripItems(items,checks);
+  }catch(e){}
 }
 
-function showNewTemplate() {
-  document.getElementById('new-template-box').style.display = 'block';
-  document.getElementById('new-tpl-name').focus();
+function renderTripMembers(){
+  const pills=document.getElementById('trip-member-pills');pills.innerHTML='';
+  tripMembers.forEach((m,i)=>{
+    const av=document.createElement('div');av.className='av '+COLORS[m.color!==undefined?m.color:i%8];
+    av.style.cursor='default';av.title=m.name;av.textContent=ini(m.name);pills.appendChild(av);
+  });
 }
 
-function hideNewTemplate() {
-  document.getElementById('new-template-box').style.display = 'none';
-  document.getElementById('new-tpl-name').value = '';
-}
-
-async function createTemplate() {
-  const name = document.getElementById('new-tpl-name').value.trim();
-  if (!name) return;
-  try {
-    await sbFetch('templates', { method: 'POST', body: JSON.stringify({ name }) });
-    hideNewTemplate();
-    loadTemplates();
-  } catch(e) { alert('Fehler: ' + e.message); }
-}
-
-async function openTemplate(t) {
-  currentTemplate = t;
-  document.getElementById('list-title').textContent = t.name;
-  document.getElementById('legend-1').textContent = name1;
-  document.getElementById('legend-2').textContent = name2;
-  showScreen('list');
-  lastItems = '';
-  await loadItems();
-  clearInterval(pollTimer);
-  pollTimer = setInterval(loadItems, 3000);
-}
-
-async function loadItems() {
-  if (!currentTemplate) return;
-  try {
-    const items = await sbFetch('items?template_id=eq.' + currentTemplate.id + '&order=created_at.asc');
-    const sig = JSON.stringify(items);
-    if (sig === lastItems) return;
-    lastItems = sig;
-    renderItems(items);
-  } catch(e) {}
-}
-
-function renderItems(items) {
-  const total = items.length;
-  const done = items.filter(i => i.checked_1 && i.checked_2).length;
-  const pct = total ? Math.round(done / total * 100) : 0;
-  document.getElementById('progress').style.width = pct + '%';
-  document.getElementById('progress-label').textContent = done + ' von ' + total + ' vollständig gepackt';
-
-  const list = document.getElementById('items-list');
-  if (!items.length) {
-    list.innerHTML = '<div class="empty"><div class="ico">✏️</div>Noch keine Artikel.<br>Füge welche unten hinzu!</div>';
-    return;
-  }
-
-  list.innerHTML = '';
-  items.forEach(item => {
-    const bothDone = item.checked_1 && item.checked_2;
-    const row = document.createElement('div');
-    row.className = 'item-row';
-    const ini1 = initials(name1), ini2 = initials(name2);
-    row.innerHTML = `
-      <span class="item-name${bothDone ? ' done' : ''}">${esc(item.name)}</span>
-      <div class="checker">
-        <div class="av${item.checked_1 ? ' c1' : ''}" onclick="toggle('${item.id}',1,${item.checked_1})" title="${esc(name1)}">${ini1}</div>
-        <div class="av${item.checked_2 ? ' c2' : ''}" onclick="toggle('${item.id}',2,${item.checked_2})" title="${esc(name2)}">${ini2}</div>
-      </div>
-      <button class="btn-sm btn-danger" onclick="deleteItem('${item.id}')" style="border:none;padding:4px 6px;font-size:13px">✕</button>`;
+function renderTripItems(items,checks){
+  const checkSet=new Set(checks.map(c=>c.trip_item_id+'_'+c.member_id));
+  const total=items.length;
+  const done=items.filter(item=>tripMembers.length>0&&tripMembers.every(m=>checkSet.has(item.id+'_'+m.id))).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('trip-progress').style.width=pct+'%';
+  document.getElementById('trip-progress-label').textContent=done+' von '+total+' vollständig gepackt';
+  const list=document.getElementById('trip-items-list');
+  if(!items.length){list.innerHTML='<div class="empty" style="padding:1rem 0">Noch keine Artikel!</div>';return}
+  list.innerHTML='';
+  items.forEach(item=>{
+    const allChecked=tripMembers.length>0&&tripMembers.every(m=>checkSet.has(item.id+'_'+m.id));
+    const row=document.createElement('div');row.className='item-row';
+    const avs=tripMembers.map((m,i)=>{
+      const checked=checkSet.has(item.id+'_'+m.id);
+      const cls=checked?COLORS[m.color!==undefined?m.color:i%8]:'';
+      const style=checked?'':'background:var(--bg);color:var(--muted);border-color:var(--border)';
+      return `<div class="av ${cls}" style="${style}" onclick="toggleCheck('${item.id}','${m.id}',${checked})" title="${esc(m.name)}">${ini(m.name)}</div>`;
+    }).join('');
+    row.innerHTML=`<span class="item-name${allChecked?' done':''}">${esc(item.name)}</span><div class="checker">${avs}</div><button class="btn-icon btn-danger" onclick="deleteTripItem('${item.id}')">✕</button>`;
     list.appendChild(row);
   });
 }
 
-async function toggle(id, person, current) {
-  const field = 'checked_' + person;
-  try {
-    await sbFetch('items?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ [field]: !current }) });
-    lastItems = '';
-    loadItems();
-  } catch(e) {}
+async function toggleCheck(itemId,memberId,checked){
+  try{
+    if(checked)await sbFetch('item_checks?trip_item_id=eq.'+itemId+'&member_id=eq.'+memberId,{method:'DELETE'});
+    else await sbFetch('item_checks',{method:'POST',body:JSON.stringify({trip_item_id:itemId,member_id:memberId}),headers:{'Prefer':'return=minimal'}});
+    lastSig='';loadTripData();
+  }catch(e){}
+}
+async function addTripItem(){
+  const inp=document.getElementById('new-trip-item');
+  const name=inp.value.trim();if(!name||!currentTrip)return;
+  inp.value='';
+  await sbFetch('trip_items',{method:'POST',body:JSON.stringify({trip_id:currentTrip.id,name})});
+  lastSig='';loadTripData();
+}
+document.getElementById('new-trip-item').addEventListener('keydown',e=>{if(e.key==='Enter')addTripItem()});
+async function deleteTripItem(id){await sbFetch('trip_items?id=eq.'+id,{method:'DELETE'});lastSig='';loadTripData()}
+async function deleteTrip(){
+  if(!confirm('Ferienliste "'+currentTrip.name+'" löschen?'))return;
+  await sbFetch('trips?id=eq.'+currentTrip.id,{method:'DELETE'});goHome();
+}
+async function resetTripChecks(){
+  if(!confirm('Alle Häkchen zurücksetzen?'))return;
+  const items=await sbFetch('trip_items?trip_id=eq.'+currentTrip.id+'&select=id');
+  await Promise.all(items.map(i=>sbFetch('item_checks?trip_item_id=eq.'+i.id,{method:'DELETE'})));
+  lastSig='';loadTripData();
 }
 
-async function addItem() {
-  const inp = document.getElementById('new-item-name');
-  const name = inp.value.trim();
-  if (!name || !currentTemplate) return;
-  inp.value = '';
-  try {
-    await sbFetch('items', { method: 'POST', body: JSON.stringify({ template_id: currentTemplate.id, name }) });
-    lastItems = '';
-    loadItems();
-  } catch(e) { alert('Fehler: ' + e.message); }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('new-item-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addItem();
-  });
-  document.getElementById('new-tpl-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') createTemplate();
-  });
-});
-
-async function deleteItem(id) {
-  if (!confirm('Artikel löschen?')) return;
-  try {
-    await sbFetch('items?id=eq.' + id, { method: 'DELETE' });
-    lastItems = '';
-    loadItems();
-  } catch(e) {}
-}
-
-async function deleteTemplate() {
-  if (!confirm('Vorlage "' + currentTemplate.name + '" und alle Artikel löschen?')) return;
-  try {
-    await sbFetch('templates?id=eq.' + currentTemplate.id, { method: 'DELETE' });
-    goHome();
-  } catch(e) { alert('Fehler: ' + e.message); }
-}
-
-async function resetChecks() {
-  if (!confirm('Alle Häkchen zurücksetzen?')) return;
-  try {
-    const items = await sbFetch('items?template_id=eq.' + currentTemplate.id + '&select=id');
-    await Promise.all(items.map(i =>
-      sbFetch('items?id=eq.' + i.id, { method: 'PATCH', body: JSON.stringify({ checked_1: false, checked_2: false }) })
-    ));
-    lastItems = '';
-    loadItems();
-  } catch(e) {}
-}
-
-function copySQL() {
-  navigator.clipboard.writeText(SQL).then(() => alert('SQL kopiert!')).catch(() => {
-    prompt('SQL zum Kopieren:', SQL);
-  });
-}
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function initials(n) {
-  return (n || '?').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
+function showMsg(id,txt,err){const el=document.getElementById(id);el.textContent=txt;el.className='msg'+(err?' err':' ok')}
+function copySQL(){navigator.clipboard.writeText(SQL).then(()=>alert('SQL kopiert!')).catch(()=>prompt('SQL:',SQL))}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function ini(n){return(n||'?').trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2)}
 
 init();
 </script>
