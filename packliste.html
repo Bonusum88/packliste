@@ -476,8 +476,8 @@ async function loadTripData(){
     tripMembers=membersRaw.map(m=>m.family_members).filter(Boolean);
     let checks=[];
     if(items.length){
-      const ids=items.map(i=>'trip_item_id=eq.'+i.id).join(',');
-      checks=await sbFetch('item_checks?or=('+ids+')&select=trip_item_id,member_id');
+      const ids=items.map(i=>i.id).join(',');
+      checks=await sbFetch('item_checks?trip_item_id=in.('+ids+')&select=trip_item_id,member_id');
     }
     const sig=JSON.stringify({items,checks,tripMembers});
     if(sig===lastSig)return;lastSig=sig;
